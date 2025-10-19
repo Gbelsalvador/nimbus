@@ -1,0 +1,500 @@
+# User Guide
+
+**Nimbus** - An integrated, in-browser API client for Laravel with automatic schema discovery.
+
+This guide covers everything you need to know about using Nimbus to test and explore your Laravel APIs.
+
+---
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+    - [Installation](#installation)
+    - [Accessing Nimbus](#accessing-nimbus)
+    - [Interface Overview](#interface-overview)
+- [Using Nimbus](#using-nimbus)
+    - [Route Explorer](#route-explorer)
+    - [Request Builder](#request-builder)
+    - [Response Viewer](#response-viewer)
+    - [Cookie Inspection](#cookie-inspection)
+- [Authentication](#authentication)
+    - [Session-Based Authentication](#session-based-authentication)
+    - [Bearer Tokens](#bearer-tokens)
+    - [Basic Auth](#basic-auth)
+    - [User Impersonation](#user-impersonation)
+- [Advanced Features](#advanced-features)
+    - [Global Headers](#global-headers)
+    - [Value Generators](#value-generators)
+    - [Auto-Fill Payloads](#auto-fill-payloads)
+    - [Export to cURL](#export-to-curl)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [Getting Help](#getting-help)
+
+---
+
+## Getting Started
+
+### Installation
+
+#### Requirements
+
+- PHP 8.2 or higher.
+- Laravel 10.x, 11.x, or 12.x.
+
+#### Install via Composer
+
+```bash
+composer require sunchayn/nimbus
+```
+
+#### Publish Configuration and Assets
+
+```bash
+php artisan vendor:publish --tag=nimbus-assets --tag=nimbus-config
+```
+
+This publishes:
+- `config/nimbus.php` - Configuration file
+- Frontend assets required for the interface
+
+### Accessing Nimbus
+
+Once installed, start your Laravel application using a real web server (Herd, Sail, Docker, Nginx, etc.) and navigate to:
+
+```
+http://your-app.test/nimbus
+```
+
+**Important**: Do not use PHP's built-in server (`php artisan serve`). The relay endpoint requires a web server that can handle concurrent requests.
+
+### Interface Overview
+
+The Nimbus interface consists of three main panels:
+
+![Interface Sections](./assets/empty-client-sections.png)
+
+1. **Route Explorer** (left) - Browse and select API routes.
+2. **Request Builder** (center) - Configure and send requests.
+3. **Response Viewer** (right) - View responses and details.
+
+---
+
+## Using Nimbus
+
+### Route Explorer
+
+The Route Explorer automatically discovers your Laravel API routes and organizes them by resource.
+
+![Routes](./assets/routes.png)
+
+**Features:**
+- Routes are grouped by resource (e.g., all user-related endpoints together).
+- Each route shows its HTTP methods.
+- Click any route to load it in the Request Builder.
+- Routes are extracted based on your configured API prefix.
+
+### Request Builder
+
+The Request Builder provides an intuitive interface for configuring API requests.
+
+![Request Builder](./assets/request-builder.png)
+
+#### Components
+
+**Method Selection**
+- HTTP method is automatically set from the route.
+- The methods supported by the route are groupped together in the list.
+
+**URL Parameters**
+- Add query string parameters.
+- Real-time URL preview.
+
+**Headers**
+- Add custom headers.
+- Global headers automatically included.
+
+**Request Body**
+- JSON editor with syntax highlighting.
+- Schema validation based on Laravel validation rules.
+- Real-time validation feedback.
+
+**Authorization**
+- Multiple authentication methods.
+- See [Authentication](#authentication) section for details.
+
+#### Schema-Aware Editing
+
+Nimbus analyzes your Laravel validation rules to provide intelligent editing:
+
+![Schema Validation](./assets/schema-validation.png)
+
+**Validation Features:**
+- Required fields are highlighted.
+- Field types are enforced (string, number, boolean, etc.).
+- Validation errors shown in real-time.
+- Nested object and array support.
+
+#### Auto-Fill Payloads
+
+Populate entire request payloads with realistic test data.
+
+![Auto Fill](./assets/auto-fill.png)
+
+**How it works:**
+1. Click the "Auto Fill" button.
+2. Nimbus generates values based on validation rules and field names.
+3. Review and modify generated values as needed.
+
+**Smart Generation:**
+Field names are cross-checked against a pre-defined set of patterns, common names will get an adequate generated value that cannot normally be inferred from a validation rule (e.g., the address fields from the example above):
+- `email` fields → realistic email addresses
+- `password` fields → secure random passwords
+- `uuid` fields → valid UUIDs
+- `date` fields → properly formatted dates
+- Numeric fields → values within min/max constraints
+
+### Response Viewer
+
+The Response Viewer displays detailed information about API responses.
+
+![Response](./assets/response.png)
+
+**Displayed Information:**
+- HTTP status code with description.
+- Response time in milliseconds.
+- Complete response headers.
+- Formatted response body with syntax highlighting.
+- Cookie information (see [Cookie Inspection](#cookie-inspection)).
+
+**Features:**
+- Collapsible sections for better organization.
+- Copy response body to clipboard.
+- Pretty-printed JSON for readability.
+
+### Cookie Inspection
+
+View and decrypt Laravel session cookies with ease.
+
+![Cookies](./assets/cookies.png)
+
+**Raw Cookies:**
+The raw values as observed in the `Set-Cookie` headers from the response.
+
+![Decrypted Cookies](./assets/decrypted-cookies.png)
+
+**Decrypted Cookies:**
+Automatic decryption of Laravel encrypted cookies.
+
+---
+
+## Authentication
+
+Nimbus supports multiple authentication methods for testing protected endpoints.
+
+![Authorization Options](./assets/auth-options.png)
+
+### Session-Based Authentication
+
+**Current User Session** allows you to make requests as the currently logged-in user from your main application.
+
+**How it works:**
+1. Log into your Laravel application in another tab.
+2. Select "Current User Session" in Nimbus.
+3. Requests will include your session cookies.
+
+### Bearer Tokens
+
+Standard Bearer token authentication for API endpoints.
+
+**Use case:** Testing JWT or Sanctum token-protected endpoints.
+
+**How to use:**
+1. Select "Bearer" from authentication options.
+2. Enter your access token.
+3. Token is sent in `Authorization: Bearer {token}` header.
+
+### Basic Auth
+
+HTTP Basic Authentication with username and password.
+
+**Use case:** Testing endpoints protected with Basic Auth.
+
+**How to use:**
+1. Select "Basic" from authentication options.
+2. Enter username and password.
+3. Credentials are base64-encoded and sent in `Authorization` header.
+
+### User Impersonation
+
+Make requests as any user in your system using their user ID.
+
+**Use case:** Testing how endpoints behave for different users without logging in as them.
+
+**How it works:**
+1. Select "Impersonate" from authentication options.
+2. Enter the user ID.
+3. Nimbus authenticates the request as that user.
+
+---
+
+## Advanced Features
+
+### Global Headers
+
+Configure headers that are automatically included in every request.
+
+**Configuration:**
+
+Edit `config/nimbus.php`:
+
+```php
+'headers' => [
+    'x-api-version' => '1.0',
+    'x-request-id' => \Sunchayn\Nimbus\Modules\Config\GlobalHeaderGeneratorTypeEnum::Uuid,
+    'x-session-id' => \Sunchayn\Nimbus\Modules\Config\GlobalHeaderGeneratorTypeEnum::Uuid,
+    'host' => 'example.com',
+],
+```
+
+**Dynamic Values:**
+
+Use `GlobalHeaderGeneratorTypeEnum` for randomly generated values, for example:
+- `Uuid` - Generate a UUID for each request
+- Additional generators available in the enum
+
+**Use cases:**
+- API versioning headers.
+- Request tracking IDs.
+- Custom authentication keys.
+- Host headers for multi-tenant apps.
+
+### Value Generators
+
+Generate realistic values for headers and parameters on-demand.
+
+![Value Generator](./assets/value-generator.png)
+
+**How to use:**
+1. Focus on a value input field.
+2. Click the generator icon (or press Shift twice).
+3. Select the type of value to generate.
+4. Press Enter or click on the generator to insert.
+
+**Available generators:**
+- UUIDs.
+- Email addresses.
+- Names (first, last, full).
+- Dates (various formats).
+- Phone numbers.
+- URLs.
+- And more...
+
+### Export to cURL
+
+Export configured requests as cURL commands for use in terminals or scripts.
+
+![Click on Export](./assets/click-on-export.png)
+
+**How to export:**
+1. Configure your request completely
+2. Click the export button
+3. Copy the generated cURL command
+
+![cURL Command Export](./assets/curl-command-export.png)
+
+**What's included:**
+- Full URL with parameters
+- All headers (including global headers)
+- Authentication credentials
+- Request body
+- HTTP method
+
+---
+
+## Configuration
+
+The `config/nimbus.php` file provides customization options:
+
+```php
+return [
+
+    'prefix' => 'nimbus',
+
+    'allowed_envs' => ['local', 'staging'],
+
+    'routes' => [
+        'prefix' => 'api',
+        'versioned' => false,
+    ],
+
+    'auth' => [
+        'guard' => 'web',
+        'special' => [
+            'injector' => \Sunchayn\Nimbus\Modules\Relay\Authorization\Injectors\RememberMeCookieInjector::class,
+        ],
+    ],
+
+    'headers' => [],
+];
+```
+
+### Configuration Options
+
+| Option | Description | Default | Example |
+|--------|--------------|----------|----------|
+| **`prefix`** | The URI segment under which Nimbus is accessible. | `'nimbus'` | `'api-client'` |
+| **`allowed_envs`** | Environments where Nimbus is enabled. Avoid production for security reasons. | `['local', 'staging']` | `['testing', 'local']` |
+| **`routes.prefix`** | The base path used to detect application routes. Only routes starting with this prefix are analyzed. | `'api'` | `'api/v1'` |
+| **`routes.versioned`** | Enables version parsing for routes like `/api/v1/...`. | `false` | `true` |
+| **`auth.guard`** | The Laravel guard used for the API requests authentication. | `'api'` | `'web'` |
+| **`auth.special.injector`** | Injector class used to attach authentication credentials to outgoing requests. Must implement `SpecialAuthenticationInjectorContract`. | `RememberMeCookieInjector::class` | `TymonJwtTokenInjector::class` |
+| **`headers`** | Global headers applied to all outgoing requests. Supports static values or enum generators. | `[]` | `['x-request-id' => GlobalHeaderGeneratorTypeEnum::UUID]` |
+
+#### Special Authentication Modes
+
+Nimbus comes with two authentication injection strategies:
+
+| Mode | Injector Class | Description |
+|------|----------------|-------------|
+| **RememberMe Cookie** | `RememberMeCookieInjector::class` | Authenticates using Laravel's remember-me cookie for the current session. |
+| **JWT Token** | `TymonJwtTokenInjector::class` | Injects a bearer token for JWT-authenticated APIs. |
+
+Custom injectors can be implemented by extending:
+
+```php
+Sunchayn\Nimbus\Modules\Relay\Authorization\Contracts\SpecialAuthenticationInjectorContract
+```
+
+#### Versioned Routes
+
+If your routes are versioned (e.g. `/api/v1/users`), set `routes.versioned` to `true`.  
+Nimbus will automatically extract and display version segments when generating schema representations.
+
+## Troubleshooting
+
+### Routes Not Appearing
+
+**Problem:** Your API routes don't show up in the Route Explorer.
+
+**Solutions:**
+
+1. **Check route prefix configuration**
+    - Verify `routes.prefix` in `config/nimbus.php` matches your API routes.
+    - Default is `api`, so routes should start with `/api/`.
+
+2. **Clear route cache**
+   ```bash
+   php artisan route:clear
+   ```
+
+3. **Verify route registration**
+    - Ensure routes are in `routes/api.php`.
+    - Check `RouteServiceProvider` (Laravel 10-11) or `bootstrap/app.php` (Laravel 12+).
+
+### Interface Not Loading
+
+**Problem:** The Nimbus interface shows errors or doesn't load.
+
+**Solutions:**
+
+1. **Re-publish assets**
+   ```bash
+   php artisan vendor:publish --tag=nimbus-assets --force
+   ```
+
+2. **Clear all caches**
+   ```bash
+   php artisan cache:clear
+   php artisan config:clear
+   php artisan view:clear
+   ```
+
+3. **Check browser console**
+    - Open developer tools.
+    - Look for JavaScript errors.
+    - Check for failed asset requests.
+
+### Relay Endpoint Not Working
+
+**Problem:** Requests hang or fail when sent from Nimbus.
+
+**Solutions:**
+
+1. **Use a proper web server**
+    - Do NOT use `php artisan serve`.
+    - Use Herd, Sail, Docker, Nginx, or Apache.
+    - The built-in PHP server cannot handle concurrent requests.
+
+2. **Check application URL**
+    - Verify `APP_URL` in `.env` is correct.
+    - Ensure it matches your actual domain.
+
+### Authentication Issues
+
+**Problem:** Authenticated requests fail or return unauthorized errors.
+
+**Solutions:**
+
+1. **Session authentication**
+    - Ensure you're logged into the main app.
+    - Check that session cookies are being sent.
+    - Verify session driver configuration.
+
+2. **Bearer tokens**
+    - Verify token is valid and not expired.
+    - Check token format (no extra spaces).
+    - Ensure API expects Bearer authentication.
+
+3. **User impersonation**
+    - Verify the user ID exists in your database.
+    - Check that user model is correctly configured.
+
+### Schema Validation Errors
+
+**Problem:** Valid payloads show validation errors in the editor.
+
+**Solutions:**
+
+1. **Check validation rules**
+    - Ensure Form Request rules are correct
+    - Verify inline validation syntax
+
+2. **Nested structures**
+    - Use proper dot notation (`user.profile.name`)
+    - Arrays should use `*` notation (`items.*.name`)
+
+3. **Re-publish config**
+   ```bash
+   php artisan vendor:publish --tag=nimbus-config --force
+   ```
+
+---
+
+## Getting Help
+
+### Documentation
+
+- **GitHub Repository**: [https://github.com/sunchayn/nimbus](https://github.com/sunchayn/nimbus)
+- [**Contributor Guide**](../contribution-guide/README.md): Architecture and development details.
+
+### Support Channels
+
+- **Bug Reports**: [Open an issue](https://github.com/sunchayn/nimbus/issues/new/choose)
+- **Feature Requests**: [Share your ideas](https://github.com/sunchayn/nimbus/discussions/categories/ideas)
+- **Questions**: [Ask in discussions](https://github.com/sunchayn/nimbus/discussions/categories/q-a)
+
+### Before Asking for Help
+
+1. Check this troubleshooting section.
+2. Search existing GitHub issues.
+3. Verify your Laravel and PHP versions meet requirements.
+4. Try clearing all caches.
+5. Check the browser console for JavaScript errors.
+
+When reporting issues, include:
+- Laravel version.
+- PHP version.
+- Nimbus version.
+- Error messages or screenshots.
+- Steps to reproduce the problem (you can fork the [dev repository](https://github.com/sunchayn/nimbus-dev) if needed).

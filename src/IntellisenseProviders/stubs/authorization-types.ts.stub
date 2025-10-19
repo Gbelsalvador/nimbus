@@ -1,0 +1,11 @@
+export enum AuthorizationType {
+{{ content }}
+}
+
+/**
+ * Individual authorization type item
+ */
+export type AuthorizationTypeItem = {
+    readonly id: AuthorizationType;
+    readonly label: string;
+};

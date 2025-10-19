@@ -1,0 +1,72 @@
+name: fix-code-issues
+
+on:
+  push:
+    paths:
+      - '**.php'
+      - '**.js'
+      - '**.vue'
+      - '**.ts'
+      - '**.vue'
+      - 'package.json'
+      - 'composer.json'
+
+permissions:
+  contents: write
+
+jobs:
+  style-fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        if: ${{ !env.ACT }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Fix js styles if Eslint passes
+        run: npm run style:fix
+
+      - name: Commit changes
+        if: ${{ !env.ACT }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: apply TS style fixes"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Rector
+        run: composer rector
+
+      - name: Commit changes
+        if: ${{ !env.ACT }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "refactor: apply rector"
+
+      - name: Fix php styles
+        run: composer style:fix
+
+      - name: Commit changes
+        if: ${{ !env.ACT }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: apply php style fixes"

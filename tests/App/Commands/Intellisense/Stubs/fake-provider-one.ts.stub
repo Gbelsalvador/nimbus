@@ -1,0 +1,5 @@
+type FakeProviderOne = string;
+
+enum FakeOneValues {
+{{ content }}
+}

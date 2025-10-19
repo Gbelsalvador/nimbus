@@ -1,0 +1,12 @@
+export enum GeneratorType {
+{{ content }}
+}
+
+/**
+ * Source global headers type for request configuration
+ */
+export type SourceGlobalHeaders = {
+    header: string;
+    type: 'raw' | 'generator';
+    value: GeneratorType | string | number;
+};

@@ -1,0 +1,127 @@
+{
+  "_CopyButton.vue_vue_type_script_setup_true_lang.js": {
+    "file": "assets/CopyButton.vue_vue_type_script_setup_true_lang.js",
+    "name": "CopyButton.vue_vue_type_script_setup_true_lang",
+    "imports": [
+      "resources/js/app/app.ts",
+      "_index.js"
+    ]
+  },
+  "_PageLayout.vue_vue_type_script_setup_true_lang.js": {
+    "file": "assets/PageLayout.vue_vue_type_script_setup_true_lang.js",
+    "name": "PageLayout.vue_vue_type_script_setup_true_lang",
+    "imports": [
+      "resources/js/app/app.ts"
+    ]
+  },
+  "_index.js": {
+    "file": "assets/index.js",
+    "name": "index",
+    "imports": [
+      "resources/js/app/app.ts"
+    ]
+  },
+  "_useResponsiveResizable.css": {
+    "file": "assets/useResponsiveResizable.css",
+    "src": "_useResponsiveResizable.css"
+  },
+  "_useResponsiveResizable.js": {
+    "file": "assets/useResponsiveResizable.js",
+    "name": "useResponsiveResizable",
+    "imports": [
+      "resources/js/app/app.ts",
+      "_index.js"
+    ],
+    "css": [
+      "assets/useResponsiveResizable.css"
+    ]
+  },
+  "node_modules/shiki/dist/langs/javascript.mjs": {
+    "file": "assets/javascript.js",
+    "name": "javascript",
+    "src": "node_modules/shiki/dist/langs/javascript.mjs",
+    "isDynamicEntry": true
+  },
+  "node_modules/shiki/dist/themes/vitesse-dark.mjs": {
+    "file": "assets/vitesse-dark.js",
+    "name": "vitesse-dark",
+    "src": "node_modules/shiki/dist/themes/vitesse-dark.mjs",
+    "isDynamicEntry": true
+  },
+  "node_modules/shiki/dist/themes/vitesse-light.mjs": {
+    "file": "assets/vitesse-light.js",
+    "name": "vitesse-light",
+    "src": "node_modules/shiki/dist/themes/vitesse-light.mjs",
+    "isDynamicEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app/app.ts": {
+    "file": "assets/app.js",
+    "name": "app",
+    "src": "resources/js/app/app.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/pages/Main.vue",
+      "resources/js/pages/Settings.vue",
+      "resources/js/pages/Status.vue"
+    ],
+    "css": [
+      "assets/app.css"
+    ]
+  },
+  "resources/js/pages/Main.vue": {
+    "file": "assets/Main.js",
+    "name": "Main",
+    "src": "resources/js/pages/Main.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_useResponsiveResizable.js",
+      "resources/js/app/app.ts",
+      "_CopyButton.vue_vue_type_script_setup_true_lang.js",
+      "_index.js"
+    ],
+    "dynamicImports": [
+      "node_modules/shiki/dist/themes/vitesse-light.mjs",
+      "node_modules/shiki/dist/themes/vitesse-dark.mjs",
+      "node_modules/shiki/dist/langs/javascript.mjs"
+    ],
+    "css": [
+      "assets/Main.css",
+      "assets/app.css"
+    ]
+  },
+  "resources/js/pages/Settings.vue": {
+    "file": "assets/Settings.js",
+    "name": "Settings",
+    "src": "resources/js/pages/Settings.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index.js",
+      "resources/js/app/app.ts",
+      "_CopyButton.vue_vue_type_script_setup_true_lang.js",
+      "_PageLayout.vue_vue_type_script_setup_true_lang.js"
+    ],
+    "css": [
+      "assets/app.css"
+    ]
+  },
+  "resources/js/pages/Status.vue": {
+    "file": "assets/Status.js",
+    "name": "Status",
+    "src": "resources/js/pages/Status.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_useResponsiveResizable.js",
+      "_index.js",
+      "resources/js/app/app.ts",
+      "_PageLayout.vue_vue_type_script_setup_true_lang.js"
+    ],
+    "css": [
+      "assets/app.css"
+    ]
+  }
+}

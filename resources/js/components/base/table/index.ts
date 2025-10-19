@@ -1,0 +1,9 @@
+export { default as AppTable } from './AppTable.vue';
+export { default as AppTableBody } from './AppTableBody.vue';
+export { default as AppTableCaption } from './AppTableCaption.vue';
+export { default as AppTableCell } from './AppTableCell.vue';
+export { default as AppTableEmpty } from './AppTableEmpty.vue';
+export { default as AppTableFooter } from './AppTableFooter.vue';
+export { default as AppTableHead } from './AppTableHead.vue';
+export { default as AppTableHeader } from './AppTableHeader.vue';
+export { default as AppTableRow } from './AppTableRow.vue';

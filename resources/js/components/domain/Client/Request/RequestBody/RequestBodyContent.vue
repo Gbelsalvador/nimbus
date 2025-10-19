@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import { RequestBodyTypeEnum } from '@/interfaces/http';
+import { JsonSchema } from '@/interfaces/schema/shape';
+import RequestBodyFormData from './RequestBodyFormData.vue';
+import RequestBodyFormNone from './RequestBodyFormNone.vue';
+import RequestBodyJson from './RequestBodyJson.vue';
+import RequestBodyPlainText from './RequestBodyPlainText.vue';
+
+interface RequestBodyContentProps {
+    payloadType: RequestBodyTypeEnum;
+    payload: FormData | string | null;
+    schema?: JsonSchema;
+}
+
+defineProps<RequestBodyContentProps>();
+
+const emit = defineEmits<{
+    'update:payload': [value: FormData | string | null];
+}>();
+
+const updatePayload = (value: FormData | string | null) => {
+    emit('update:payload', value);
+};
+</script>
+
+<template>
+    <div class="min-h-0 w-full flex-1">
+        <RequestBodyJson
+            v-if="payloadType === RequestBodyTypeEnum.JSON"
+            :model-value="payload as string"
+            :schema="schema"
+            @update:model-value="updatePayload"
+        />
+        <RequestBodyFormData
+            v-else-if="payloadType === RequestBodyTypeEnum.FORM_DATA"
+            :model-value="payload as FormData"
+            @update:model-value="updatePayload"
+        />
+        <RequestBodyPlainText
+            v-else-if="payloadType === RequestBodyTypeEnum.PLAIN_TEXT"
+            :model-value="payload as string"
+            @update:model-value="updatePayload"
+        />
+        <RequestBodyFormNone v-else @update:model-value="updatePayload" />
+    </div>
+</template>

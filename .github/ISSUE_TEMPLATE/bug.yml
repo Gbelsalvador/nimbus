@@ -1,0 +1,58 @@
+name: Bug Report
+description: Report an Issue or Bug with Nimbus
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We're sorry to hear you're experiencing an issue with Nimbus. Please help us resolve it by providing the following details.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect to happen?
+      placeholder: I encountered an issue when I tried X, and it resulted in Y.
+    validations:
+      required: true
+  - type: textarea
+    id: how-to-reproduce
+    attributes:
+      label: How to reproduce the bug
+      description: Please provide steps to reproduce the issue, including any configuration details or settings.
+      placeholder: 'Step 1: Do this. Step 2: Do that. Then the issue occurred.'
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Nimbus Version
+      description: What version of Nimbus are you using? Please be as specific as possible.
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: What browser (and version) are you using? (e.g., Chrome 112.0.0)
+      placeholder: Chrome 112.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-systems
+    attributes:
+      label: Operating System(s)
+      description: Select the operating systems where the issue occurs.
+      multiple: true
+      options:
+        - macOS
+        - Windows
+        - Linux
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Use this field to provide any other notes that might be relevant to the issue.
+    validations:
+      required: false

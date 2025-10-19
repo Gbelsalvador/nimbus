@@ -1,0 +1,59 @@
+<script setup lang="ts">
+import HttpVerbLabel from '@/components/domain/HttpVerbLabel/HttpVerbLabel.vue';
+import { ExceptionRouteContext } from '@/interfaces/routes/exceptions';
+
+interface RouteInformationSectionProps {
+    routeContext: ExceptionRouteContext;
+}
+
+defineProps<RouteInformationSectionProps>();
+</script>
+
+<template>
+    <div>
+        <h3 class="mb-2 font-semibold">Route Information</h3>
+        <div class="space-y-2 rounded-lg border p-4">
+            <!-- URI -->
+            <div v-if="routeContext.uri" class="flex items-center gap-2">
+                <span class="text-subtle-foreground w-20 text-sm font-medium">URI:</span>
+                <code class="bg-subtle-background rounded border px-2 py-1 text-sm">
+                    {{ routeContext.uri }}
+                </code>
+            </div>
+
+            <!-- HTTP Methods -->
+            <div v-if="routeContext.methods" class="flex items-center gap-2">
+                <span class="text-subtle-foreground w-20 text-sm font-medium">
+                    Methods:
+                </span>
+                <div class="flex gap-1">
+                    <HttpVerbLabel
+                        v-for="method in routeContext.methods"
+                        :key="method"
+                        :method="method"
+                    />
+                </div>
+            </div>
+
+            <!-- Controller Class -->
+            <div v-if="routeContext.controllerClass" class="flex items-center gap-2">
+                <span class="w-20 text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Controller:
+                </span>
+                <code class="bg-subtle-background rounded border px-2 py-1 text-sm">
+                    {{ routeContext.controllerClass }}
+                </code>
+            </div>
+
+            <!-- Controller Method -->
+            <div v-if="routeContext.controllerMethod" class="flex items-center gap-2">
+                <span class="w-20 text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Method:
+                </span>
+                <code class="bg-subtle-background rounded border px-2 py-1 text-sm">
+                    {{ routeContext.controllerMethod }}
+                </code>
+            </div>
+        </div>
+    </div>
+</template>

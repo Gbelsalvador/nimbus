@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+@import './variables/theme.css';
+@import './variables/layout.css';
+@import './vendor.css';
+
+@config "../../tools/tailwind/tailwind.config.js";
+
+@layer base {
+    body {
+        overscroll-behavior: none;
+        background: var(--color-background);
+        color: var(--color-foreground);
+    }
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-border);
+    }
+
+    button,
+    [role='button'] {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    [role='button']:disabled {
+        cursor: default;
+    }
+}
+
+@layer components {
+    .cm-focused {
+        outline: none !important;
+    }
+
+    .gw {
+        position: fixed;
+        will-change: contents, height, width;
+    }
+
+    .gw-glitched {
+        @apply text-gray-500;
+    }
+
+    .cm-gutters {
+        background-color: var(--color-subtle-background) !important;
+        border-color: var(--color-border) !important;
+    }
+
+    .cm-activeLineGutter, .cm-activeLine {
+        background-color: var(--color-accent) !important;
+    }
+
+    .cm-line span {
+        color: var(--color-muted-foreground) !important;
+    }
+}
+
+@layer utilities {
+    /*
+     * Height utilities.
+     */
+
+    .h-toolbar {
+        min-height: var(--toolbar-height);
+        max-height: var(--toolbar-height);
+    }
+
+    .h-sub-toolbar {
+        min-height: var(--sub-toolbar-height);
+        max-height: var(--sub-toolbar-height);
+    }
+
+    /*
+     * Panel content padding utilities.
+     */
+
+    .p-panel {
+        padding: var(--panel-padding-x);
+    }
+
+    .px-panel {
+        padding-inline: var(--panel-padding-x);
+    }
+
+    .pl-panel {
+        padding-left: var(--panel-padding-x);
+    }
+
+    .pr-panel {
+        padding-right: var(--panel-padding-x);
+    }
+
+    .text-subtle {
+        color: var(--color-subtle-foreground);
+    }
+}

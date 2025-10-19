@@ -1,0 +1,38 @@
+<script setup lang="ts">
+import { cn } from '@/utils/ui';
+import { Check } from 'lucide-vue-next';
+import type { CheckboxRootEmits, CheckboxRootProps } from 'reka-ui';
+import { CheckboxIndicator, CheckboxRoot, useForwardPropsEmits } from 'reka-ui';
+import { computed, type HTMLAttributes } from 'vue';
+
+const props = defineProps<CheckboxRootProps & { class?: HTMLAttributes['class'] }>();
+const emits = defineEmits<CheckboxRootEmits>();
+
+const delegatedProps = computed(() => {
+    const { class: _, ...delegated } = props;
+
+    return delegated;
+});
+
+const forwarded = useForwardPropsEmits(delegatedProps, emits);
+</script>
+
+<template>
+    <CheckboxRoot
+        v-bind="forwarded"
+        :class="
+            cn(
+                'peer h-4 w-4 shrink-0 rounded-sm border border-zinc-200 border-zinc-900 shadow focus-visible:ring-1 focus-visible:ring-zinc-950 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-zinc-900 data-[state=checked]:text-zinc-50 dark:border-zinc-50 dark:border-zinc-800 dark:focus-visible:ring-zinc-300 dark:data-[state=checked]:bg-zinc-50 dark:data-[state=checked]:text-zinc-900',
+                props.class,
+            )
+        "
+    >
+        <CheckboxIndicator
+            class="flex h-full w-full items-center justify-center text-current"
+        >
+            <slot>
+                <Check class="h-4 w-4" />
+            </slot>
+        </CheckboxIndicator>
+    </CheckboxRoot>
+</template>

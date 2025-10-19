@@ -1,0 +1,177 @@
+<script setup lang="ts">
+import { AppLabel } from '@/components/base/label';
+import { useConfigStore } from '@/stores';
+import { GlobeIcon, RouteIcon, ShieldIcon } from 'lucide-vue-next';
+import { computed } from 'vue';
+
+defineOptions({
+    name: 'ConfigReadonlySection',
+});
+
+const configStore = useConfigStore();
+
+const configData = computed(() => ({
+    routePrefix: 'api',
+    isVersioned: configStore.isVersioned,
+    baseUrl: configStore.apiUrl,
+    basePath: configStore.appBasePath,
+    globalHeaders: configStore.headers,
+}));
+</script>
+
+<template>
+    <div class="space-y-6">
+        <!-- Route Configuration -->
+        <div class="grid gap-2 sm:grid-cols-12 sm:gap-8">
+            <div class="col-span-4">
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <RouteIcon class="h-4 w-4" />
+                        <h3 class="text-sm font-medium">Route Configuration</h3>
+                    </div>
+                    <p class="text-muted-foreground text-xs">
+                        API routing settings including prefix and versioning
+                        configuration.
+                    </p>
+                </div>
+            </div>
+            <div class="col-span-8">
+                <div class="rounded-lg border p-3.5">
+                    <div class="grid gap-2 sm:grid-cols-2 sm:gap-6">
+                        <div class="space-y-2">
+                            <AppLabel class="text-muted-foreground text-xs">
+                                Route Prefix
+                            </AppLabel>
+                            <div
+                                class="flex h-9 items-center rounded bg-zinc-100 px-3 font-mono text-sm dark:bg-zinc-900"
+                            >
+                                {{ configData.routePrefix }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <AppLabel class="text-muted-foreground text-xs">
+                                Versioned
+                            </AppLabel>
+                            <div
+                                class="flex h-9 items-center rounded bg-zinc-100 px-3 text-sm dark:bg-zinc-900"
+                            >
+                                <div class="flex items-center space-x-2">
+                                    <div
+                                        :class="
+                                            configData.isVersioned
+                                                ? 'bg-green-500'
+                                                : 'bg-gray-400'
+                                        "
+                                        class="h-2 w-2 rounded-full"
+                                    ></div>
+                                    <span>
+                                        {{
+                                            configData.isVersioned
+                                                ? 'Enabled'
+                                                : 'Disabled'
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Configuration -->
+        <div class="grid gap-2 sm:grid-cols-12 sm:gap-8">
+            <div class="col-span-4">
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <GlobeIcon class="h-4 w-4" />
+                        <h3 class="text-sm font-medium">API Configuration</h3>
+                    </div>
+                    <p class="text-muted-foreground text-xs">
+                        Base URL and path settings for API endpoints.
+                    </p>
+                </div>
+            </div>
+            <div class="col-span-8">
+                <div class="rounded-lg border p-3.5">
+                    <div class="grid gap-2 sm:grid-cols-2 sm:gap-6">
+                        <div class="space-y-2">
+                            <AppLabel class="text-muted-foreground text-xs">
+                                Base URL
+                            </AppLabel>
+                            <div
+                                class="flex h-9 items-center rounded bg-zinc-100 px-3 font-mono text-sm dark:bg-zinc-900"
+                            >
+                                {{ configData.baseUrl }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <AppLabel class="text-muted-foreground text-xs">
+                                Base Path
+                            </AppLabel>
+                            <div
+                                class="flex h-9 items-center rounded bg-zinc-100 px-3 font-mono text-sm dark:bg-zinc-900"
+                            >
+                                {{ configData.basePath || 'None' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Headers -->
+        <div class="grid gap-2 sm:grid-cols-12 sm:gap-8">
+            <div class="col-span-4">
+                <div class="space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <ShieldIcon class="h-4 w-4" />
+                        <h3 class="text-sm font-medium">Global Headers</h3>
+                    </div>
+                    <p class="text-muted-foreground text-xs">
+                        Headers automatically included with all API requests.
+                    </p>
+                </div>
+            </div>
+            <div class="col-span-8">
+                <div class="rounded-lg border p-3.5">
+                    <div v-if="configData.globalHeaders.length > 0" class="space-y-3">
+                        <div
+                            v-for="header in configData.globalHeaders"
+                            :key="header.header"
+                            class="flex items-center justify-between rounded bg-zinc-100 p-3.5 dark:bg-zinc-900"
+                        >
+                            <span class="font-mono text-sm">{{ header.header }}</span>
+                            <div class="flex items-center space-x-2">
+                                <div
+                                    :class="
+                                        header.type === 'generator'
+                                            ? 'bg-blue-500'
+                                            : 'bg-gray-500'
+                                    "
+                                    class="h-2 w-2 rounded-full"
+                                ></div>
+                                <span class="text-muted-foreground text-xs">
+                                    {{
+                                        header.type === 'generator'
+                                            ? 'Generated'
+                                            : 'Static'
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        v-else
+                        class="text-muted-foreground py-4 text-center text-sm italic"
+                    >
+                        No global headers configured
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

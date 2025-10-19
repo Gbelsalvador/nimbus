@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "jsx": "preserve",
+        "strict": true,
+        "isolatedModules": true,
+        "target": "ESNext",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "noEmit": true,
+        "skipLibCheck": true,
+        "paths": {
+            "@/*": ["./js/*"]
+        },
+        "types": ["./types/global", "./types/vue-shims"]
+    },
+    "include": [
+        "js/**/*.ts",
+        "js/**/*.vue",
+        "types/**/*.d.ts"
+    ]
+}

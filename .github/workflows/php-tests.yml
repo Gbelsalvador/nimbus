@@ -1,0 +1,66 @@
+name: run-php-tests
+
+on:
+  push:
+    paths:
+      - '**.php'
+      - '.github/workflows/php-tests.yml'
+      - '../../tests/phpunit.xml.dist'
+      - 'composer.json'
+      - 'composer.lock'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.4, 8.3, 8.2]
+        laravel: [12, 11, 10]
+
+    name: P${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+
+    steps:
+      - name: Checkout code
+        if: ${{ !env.ACT }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, mbstring, pcntl, intl, fileinfo, sodium
+          coverage: pcov
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: composer-${{ matrix.php }}-L${{ matrix.laravel }}-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ matrix.php }}-L${{ matrix.laravel }}
+            composer-${{ matrix.php }}
+
+      - name: Install dependencies
+        run: |
+          composer switch l:${{ matrix.laravel }} -- -- --no-interaction --no-progress --ansi
+          composer dump-autoload --optimize
+
+      - name: Execute tests with coverage
+        if: matrix.php == '8.3' && matrix.laravel == 12
+        run: composer test:coverage-ci
+
+      - name: Execute tests
+        if: matrix.php != '8.3' || matrix.laravel != 12
+        run: composer test:parallel
+
+      - name: Upload coverage reports to Codecov
+        if: matrix.php == '8.3' && matrix.laravel == 12
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./build/coverage.xml
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

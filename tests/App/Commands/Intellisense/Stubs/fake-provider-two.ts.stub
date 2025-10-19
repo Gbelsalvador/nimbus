@@ -1,0 +1,5 @@
+enum FakeTwoValues {
+{{ content }}
+}
+
+type FakeProviderTwo = number;
