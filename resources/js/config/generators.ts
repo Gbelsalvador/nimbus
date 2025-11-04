@@ -11,6 +11,7 @@ import {
     CreditCardIcon,
     DatabaseIcon,
     DollarSignIcon,
+    FileCogIcon,
     FileIcon,
     FileTextIcon,
     FingerprintIcon,
@@ -22,10 +23,12 @@ import {
     LanguagesIcon,
     MailIcon,
     MapPinIcon,
+    NetworkIcon,
     HashIcon as NumberIcon,
     PercentIcon,
     PhoneCallIcon,
     PhoneIcon,
+    ShellIcon,
     ClockIcon as TimeIcon,
     TypeIcon,
     UserIcon,
@@ -49,6 +52,7 @@ export const generatorCategories = [
     { id: 'company', name: 'Company', icon: BuildingIcon },
     { id: 'identifiers', name: 'Identifiers', icon: CreditCardIcon },
     { id: 'data', name: 'Data', icon: BarChart3Icon },
+    { id: 'system', name: 'System', icon: ShellIcon },
 ];
 
 /**
@@ -413,6 +417,22 @@ const internetGenerators: ValueGenerator[] = [
         generate: config => faker.internet.password(config ?? {}),
         icon: GlobeIcon,
     },
+    {
+        id: 'ipv4',
+        name: 'IP V4',
+        description: 'Generate a random IP v4',
+        category: { id: 'internet', name: 'Internet' },
+        generate: () => faker.internet.ipv4(),
+        icon: NetworkIcon,
+    },
+    {
+        id: 'ipv6',
+        name: 'IP V6',
+        description: 'Generate a random IP v6',
+        category: { id: 'internet', name: 'Internet' },
+        generate: () => faker.internet.ipv6(),
+        icon: NetworkIcon,
+    },
 ];
 
 /**
@@ -532,6 +552,28 @@ const dataGenerators: ValueGenerator[] = [
 ];
 
 /**
+ * System generators for creating various system values.
+ */
+const systemGenerators: ValueGenerator[] = [
+    {
+        id: 'semver',
+        name: 'Semantic Version',
+        description: 'Generate a semantic version',
+        category: { id: 'system', name: 'System' },
+        generate: () => faker.system.semver(),
+        icon: FingerprintIcon,
+    },
+    {
+        id: 'extension',
+        name: 'File Extension',
+        description: 'Generate a file extension',
+        category: { id: 'system', name: 'System' },
+        generate: () => faker.system.fileExt(),
+        icon: FileCogIcon,
+    },
+];
+
+/**
  * All available value generators organized by category.
  *
  * This array contains all generators from all categories,
@@ -549,6 +591,7 @@ export const allValueGenerators: ValueGenerator[] = [
     ...companyGenerators,
     ...identifierGenerators,
     ...dataGenerators,
+    ...systemGenerators,
 ];
 
 /**
@@ -630,6 +673,8 @@ export const PROPERTY_NAME_PATTERNS: Array<{
     { pattern: /^(domain|domain[-_]?name)$/i, generatorId: 'domain' },
     { pattern: /^(username|user[-_]?name|login)$/i, generatorId: 'username' },
     { pattern: /^(password|pass|pwd)$/i, generatorId: 'password' },
+    { pattern: /^(ip|ip[-_]?v4)$/i, generatorId: 'ipv4' },
+    { pattern: /^(ip[-_]?v6)$/i, generatorId: 'ipv6' },
 
     // Database
     { pattern: /^(.+[-_])?(image|file|blob)s?$/i, generatorId: 'dataUri' },
@@ -694,6 +739,9 @@ export const PROPERTY_NAME_PATTERNS: Array<{
         generatorId: 'sentence',
     },
     { pattern: /^(slug)$/i, generatorId: 'slug' },
+
+    // System
+    { pattern: /^(version|v|semver)$/i, generatorId: 'semver' },
 
     // Other
     {
