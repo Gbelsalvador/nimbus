@@ -7,7 +7,7 @@ import { ExternalLinkIcon } from 'lucide-vue-next';
     <AppButton
         size="xs"
         as="a"
-        href="https://github.com/sunchayn/nimbus/tree/main/wiki/user-guide"
+        href="https://github.com/sunchayn/nimbus/tree/base/wiki/user-guide"
         target="_blank"
     >
         <ExternalLinkIcon />
