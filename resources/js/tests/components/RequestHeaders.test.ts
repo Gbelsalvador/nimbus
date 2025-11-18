@@ -35,7 +35,7 @@ vi.mock('@/stores', async importOriginal => {
 const renderComponent = () => renderWithProviders(RequestHeaders);
 
 const setPendingRequest = (request: PendingRequest | null) => {
-    mockRequestStore.pendingRequestData = ref(request);
+    mockRequestStore.pendingRequestData = ref(request) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 describe('RequestHeaders', () => {
@@ -162,7 +162,7 @@ describe('RequestHeaders', () => {
     });
 
     it('merges existing request headers with global ones when changing endpoints', async () => {
-        mockRequestStore.pendingRequestData.headers = [
+        (mockRequestStore.pendingRequestData as PendingRequest).headers = [
             { key: 'X-Existing', value: '123' },
             { key: 'X-Global', value: 'custom' },
         ];

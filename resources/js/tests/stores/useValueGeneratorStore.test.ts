@@ -1,5 +1,6 @@
 import { ValueGenerator } from '@/interfaces/ui';
 import { useValueGeneratorStore } from '@/stores/generators/useValueGeneratorStore';
+import { Mock } from '@vitest/spy';
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, reactive, ref } from 'vue';
@@ -87,7 +88,7 @@ describe('useValueGeneratorStore', () => {
         commandStore.addToRecentGenerators.mockClear();
         setSearchQuery.mockClear();
         setSelectedCategory.mockClear();
-        generators.forEach(generator => (generator.generate as vi.Mock).mockClear());
+        generators.forEach(generator => (generator.generate as Mock).mockClear());
     });
 
     it('generates value and records generator usage', () => {

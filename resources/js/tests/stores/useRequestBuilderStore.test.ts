@@ -1,3 +1,4 @@
+import { AuthorizationContract } from '@/interfaces';
 import { AuthorizationType } from '@/interfaces/generated';
 import { PendingRequest, RequestBodyTypeEnum, RequestHeader } from '@/interfaces/http';
 import { RouteDefinition } from '@/interfaces/routes';
@@ -80,7 +81,10 @@ describe('useRequestBuilderStore', () => {
             ...baseRoute,
             method: 'POST',
             schema: {
-                shape: {},
+                shape: {
+                    'x-name': 'root',
+                    'x-required': false,
+                },
                 extractionErrors: null,
             },
         };
@@ -120,7 +124,10 @@ describe('useRequestBuilderStore', () => {
             GET: { [RequestBodyTypeEnum.JSON]: '{}' },
         };
         const params = [{ key: 'page', value: '1' }];
-        const auth = { type: AuthorizationType.Bearer, value: 'token' };
+        const auth: AuthorizationContract = {
+            type: AuthorizationType.Bearer,
+            value: 'token',
+        };
 
         store.updateRequestHeaders(headers);
         store.updateRequestBody(body);
