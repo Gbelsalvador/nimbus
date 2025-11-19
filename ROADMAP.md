@@ -9,10 +9,10 @@ Priorities and scope may change as feedback and development progress.
 
 ### Chore & Maintenance
 | Task                                  | Priority | Status |
-|---------------------------------------|----------|--------|
-| Evaluate ESLint vs OxLint integration | P2       | ☐ |
-| Improve frontend test coverage        | P1       | ☐ |
-| E2E tests                             | P3       | ☐ |
+|---------------------------------------|----------|-------|
+| Evaluate ESLint vs OxLint integration | P2       | ✓     |
+| Improve frontend test coverage        | P1       | ✓     |
+| E2E tests                             | P3       | ✓      |
 
 ---
 
@@ -24,3 +24,6 @@ Priorities and scope may change as feedback and development progress.
 | History Viewer & Rewind                      | P2       | ☐ |
 | Auto-select route parameter segment on click | P2       | ☐ |
 | Internal shareable links                     | P3       | ☐ |
+| Support Spatie DTOs                          | P1       | ☐ |
+| OpenAPI Schema as input                      | P3       | ☐ |
+| Persist UI state                             | P2       | ☐ |
