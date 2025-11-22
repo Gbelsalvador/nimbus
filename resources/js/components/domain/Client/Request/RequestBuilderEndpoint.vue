@@ -10,13 +10,14 @@ import {
     AppSelectTrigger,
     AppSelectValue,
 } from '@/components/base/select';
+import AppTooltipWrapper from '@/components/base/tooltip/AppTooltipWrapper.vue';
+import { useRouteSegmentSelection } from '@/composables/request/useRouteSegmentSelection';
+import { RouteDefinition } from '@/interfaces/routes/routes';
+import { useConfigStore, useRequestStore } from '@/stores';
+import { generateCurlCommand } from '@/utils/request';
 import { cn } from '@/utils/ui';
 import { CodeXml, CornerDownLeftIcon } from 'lucide-vue-next';
 import { computed, HTMLAttributes, ref } from 'vue';
-
-import AppTooltipWrapper from '@/components/base/tooltip/AppTooltipWrapper.vue';
-import { useConfigStore } from '@/stores';
-import { generateCurlCommand } from '@/utils/request';
 import CurlExportDialog from './CurlExportDialog.vue';
 
 interface RequestBuilderEndpointProps {
@@ -24,9 +25,6 @@ interface RequestBuilderEndpointProps {
 }
 
 const props = defineProps<RequestBuilderEndpointProps>();
-
-import { RouteDefinition } from '@/interfaces/routes/routes';
-import { useRequestStore } from '@/stores';
 
 const availableMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -74,6 +72,13 @@ const currentRouteUnsupportedMethods = computed(() => {
         (method: string) => !currentRouteSupportedMethods.value.includes(method),
     );
 });
+
+/*
+ * Route segment selection.
+ */
+
+const { handleClick: autoSelectRouteVariableSegmentWhenApplicable } =
+    useRouteSegmentSelection({ endpoint });
 
 /*
  * Actions.
@@ -157,6 +162,7 @@ const populateCurlCommandExporterDialog = () => {
                 v-model="endpoint"
                 class="h-full flex-1 rounded-none border-0 text-xs shadow-none focus:ring-0 focus-visible:ring-0"
                 placeholder="<endpoint>"
+                @click="autoSelectRouteVariableSegmentWhenApplicable"
                 @keydown="executeCurrentRequestWhenEnterIsPressed"
             />
             <div class="flex gap-2 pr-2">
