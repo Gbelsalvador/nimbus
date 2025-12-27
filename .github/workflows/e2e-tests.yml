@@ -13,13 +13,25 @@ jobs:
         if: ${{ !env.ACT }}
         uses: actions/checkout@v4
 
+      - name: Determine branch for E2E setup
+        id: branch
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_HEAD: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            echo "branch_name=$PR_HEAD" >> $GITHUB_OUTPUT
+          else
+            echo "branch_name=base" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install JS dependencies
         run: npm ci
 
       - name: Setup PHP
@@ -37,11 +49,19 @@ jobs:
             composer-8.2-L12
             composer-8.2
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-v1
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-
+
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install
 
       - name: Setup E2E test repo
-        run: bash tests/E2E/setup.sh
+        run: bash tests/E2E/setup.sh "${{ steps.branch.outputs.branch_name }}"
 
       - name: Run Playwright tests
         run: bash tests/E2E/launch.sh & (sleep 5 && npm run test:e2e)
