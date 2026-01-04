@@ -1,7 +1,15 @@
 name: run-js-tests
 
 on:
+  pull_request:
+    paths:
+      - '**.ts'
+      - '**.js'
+      - '.github/workflows/js-tests.yml'
+      - 'package.json'
+      - 'package-lock.json'
   push:
+    branches: [ base ]
     paths:
       - '**.ts'
       - '**.js'

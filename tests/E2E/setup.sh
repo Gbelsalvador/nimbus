@@ -15,6 +15,7 @@ REPO_URL="https://github.com/sunchayn/nimbus-dev.git"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="$SCRIPT_DIR/.workdir"
+ROOT_DIR="$SCRIPT_DIR/../../"
 
 # --------------------------------------
 # HELPER FUNCTIONS
@@ -73,7 +74,7 @@ rm -rf "$TEMP_DIR"
 cd "$TARGET_DIR"
 
 # --------------------------------------
-# DEPENDENCY INSTALLATION
+# DEPENDENCY INSTALLATION (Inside Nimbus-Dev repository)
 # --------------------------------------
 
 # Install PHP dependencies
@@ -98,7 +99,7 @@ else
 fi
 
 # --------------------------------------
-# ENVIRONMENT SETUP
+# ENVIRONMENT SETUP (Inside Nimbus-Dev repository)
 # --------------------------------------
 
 ENV_FILE="$TARGET_DIR/.env"
@@ -107,7 +108,7 @@ rm -f "$ENV_FILE"
 cp "$SCRIPT_DIR/.env.template" "$ENV_FILE"
 
 # --------------------------------------
-# APPLICATION BOOTSTRAP
+# APPLICATION BOOTSTRAP (Inside Nimbus-Dev repository)
 # --------------------------------------
 
 echo "Bootstrapping application..."
@@ -116,7 +117,17 @@ echo "Bootstrapping application..."
 touch database/database.sqlite
 php artisan migrate --force
 
-# Publish Nimbus-related frontend assets
-php artisan vendor:publish --tag=nimbus-assets
+# --------------------------------------
+# Publish Nimbus-related frontend assets from the current branch.
+# --------------------------------------
 
-echo "Setup complete. Ready for E2E tests or further local usage."
+cd "$ROOT_DIR"
+
+echo "Building dev assets for Nimbus..."
+npm install
+npm run build:dev
+
+# Publish Nimbus-related frontend assets
+cp -a "$ROOT_DIR/resources/dist/." "$TARGET_DIR/public/vendor/nimbus/"
+
+echo "Setup complete. Ready for E2E tests."

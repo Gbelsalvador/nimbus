@@ -8,10 +8,12 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Mockery;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestWith;
+use Ramsey\Uuid\Uuid;
 use Sunchayn\Nimbus\Modules\Relay\Actions\RequestRelayAction;
 use Sunchayn\Nimbus\Modules\Relay\Authorization\AuthorizationCredentials;
 use Sunchayn\Nimbus\Modules\Relay\Authorization\AuthorizationTypeEnum;
@@ -19,6 +21,9 @@ use Sunchayn\Nimbus\Modules\Relay\Authorization\Handlers\AuthorizationHandler;
 use Sunchayn\Nimbus\Modules\Relay\Authorization\Handlers\AuthorizationHandlerFactory;
 use Sunchayn\Nimbus\Modules\Relay\DataTransferObjects\RelayedRequestResponseData;
 use Sunchayn\Nimbus\Modules\Relay\DataTransferObjects\RequestRelayData;
+use Sunchayn\Nimbus\Modules\Relay\Parsers\VarDumpParser\DataTransferObjects\ParseResultDto;
+use Sunchayn\Nimbus\Modules\Relay\Parsers\VarDumpParser\VarDumpParser;
+use Sunchayn\Nimbus\Modules\Relay\Responses\DumpAndDieResponse;
 use Sunchayn\Nimbus\Modules\Relay\ValueObjects\ResponseCookieValueObject;
 use Sunchayn\Nimbus\Tests\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -26,6 +31,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 #[CoversClass(RequestRelayAction::class)]
 #[CoversClass(RequestRelayData::class)]
 #[CoversClass(RelayedRequestResponseData::class)]
+#[CoversClass(DumpAndDieResponse::class)]
 class RequestRelayActionFunctionalTest extends TestCase
 {
     private const ENDPOINT = 'https://localhost/api/test-endpoint';
@@ -302,6 +308,75 @@ class RequestRelayActionFunctionalTest extends TestCase
         $this->assertCount(1, $response->cookies);
 
         $this->assertEquals('test value with spaces', $response->cookies[0]->toArray()['value']['raw']);
+    }
+
+    public function test_it_parses_dump_and_die_responses(): void
+    {
+        // Arrange
+
+        $this->freezeTime();
+
+        $requestData = new RequestRelayData(
+            method: 'GET',
+            endpoint: self::ENDPOINT,
+            authorization: AuthorizationCredentials::none(),
+            headers: [
+                'Content-Type' => 'application/json',
+                'X-Custom-Header' => $customHeaderValue = uniqid(),
+            ],
+            body: ['test' => 'data'],
+            cookies: new ParameterBag,
+        );
+
+        $uuid = fake()->uuid;
+        $stubSource = fake()->filePath();
+        $stubDumps = [
+            'type' => fake()->word(),
+            'value' => fake()->word(),
+        ];
+
+        $parseResultDtoMock = Mockery::mock(ParseResultDto::class);
+        $varDumpParserMock = $this->mock(VarDumpParser::class);
+
+        $dumpHtml = '<script> Sfdump = window.Sfdump;</script><span>Hello World!</span>';
+
+        // Anticipate
+
+        Str::createUuidsUsing(fn () => Uuid::fromString($uuid));
+
+        Http::fake(fn (Request $request) => Http::response(
+            body: $dumpHtml,
+            status: 500,
+            headers: [],
+        ));
+
+        $parseResultDtoMock
+            ->shouldReceive('toArray')
+            ->andReturn([
+                'source' => $stubSource,
+                'dumps' => $stubDumps,
+            ])
+            ->once();
+
+        $varDumpParserMock->shouldReceive('parse')->with($dumpHtml)->andReturn($parseResultDtoMock)->once();
+
+        // Act
+
+        $response = resolve(RequestRelayAction::class)->execute($requestData);
+
+        // Assert
+
+        $this->assertEquals(DumpAndDieResponse::DUMP_AND_DIE_STATUS_CODE, $response->statusCode);
+
+        $this->assertEquals(
+            [
+                'id' => $uuid,
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+                'source' => $stubSource,
+                'dumps' => $stubDumps,
+            ],
+            $response->body->body,
+        );
     }
 
     /*

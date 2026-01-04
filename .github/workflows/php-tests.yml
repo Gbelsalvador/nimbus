@@ -1,11 +1,19 @@
 name: run-php-tests
 
 on:
-  push:
+  pull_request:
     paths:
       - '**.php'
       - '.github/workflows/php-tests.yml'
       - '../../tests/phpunit.xml.dist'
+      - 'composer.json'
+      - 'composer.lock'
+  push:
+    branches: [ base ]
+    paths:
+      - '**.php'
+      - '.github/workflows/php-tests.yml'
+      - 'tests/phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
 
