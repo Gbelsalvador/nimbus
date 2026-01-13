@@ -16,7 +16,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         id: release
         with:
-          release-type: node
+          token: ${{ secrets.CI_TOKEN }}
 
       # Handle the PR artifacts while the PR is open/updated
       # The output 'pr' is only present if a release PR was created or updated.
@@ -47,12 +47,12 @@ jobs:
         if: ${{ steps.release.outputs.pr }}
         run: npm ci
 
-      - name: Update version in Settings.vue
+      - name: Get version from package.json
         if: ${{ steps.release.outputs.pr }}
+        id: package_version
         run: |
-          NEW_VERSION="v${{ fromJson(steps.release.outputs.pr).version }}"
-          # Use sed to replace the version line. Escaping single quotes for the sed command.
-          sed -i "s/const VERSION = '.*';/const VERSION = '$NEW_VERSION';/" resources/js/pages/Settings.vue
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Generate production artifacts
         if: ${{ steps.release.outputs.pr }}
@@ -62,7 +62,6 @@ jobs:
         if: ${{ steps.release.outputs.pr }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "build: update production artifacts for ${{ fromJson(steps.release.outputs.pr).version }}"
-          file_pattern: "resources/dist/* resources/js/pages/Settings.vue"
-          # Ensure we push to the correct branch
+          commit_message: "build: update production artifacts for v${{ steps.package_version.outputs.version }}"
+          file_pattern: "resources/dist/*"
           branch: ${{ fromJson(steps.release.outputs.pr).headBranchName }}

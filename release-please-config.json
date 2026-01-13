@@ -1,0 +1,15 @@
+{
+    "packages": {
+        ".": {
+            "release-type": "node",
+            "extra-files": [
+                {
+                    "type": "regex",
+                    "path": "resources/js/pages/Settings.vue",
+                    "template": "const VERSION = 'v${version}';",
+                    "glob": "const VERSION = 'v.*';"
+                }
+            ]
+        }
+    }
+}
