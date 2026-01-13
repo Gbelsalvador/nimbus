@@ -4,6 +4,37 @@
             "release-type": "node",
             "extra-files": [
                 "resources/js/pages/Settings.vue"
+            ],
+            "changelog-path": "CHANGELOG.md",
+            "changelog-sections": [
+                {
+                    "type": "feat",
+                    "section": "Features"
+                },
+                {
+                    "type": "fix",
+                    "section": "Bug Fixes"
+                },
+                {
+                    "type": "chore",
+                    "section": "Maintenance Tasks"
+                },
+                {
+                    "type": "build",
+                    "section": "CI/CD"
+                },
+                {
+                    "type": "deps",
+                    "section": "Dependency Updates"
+                },
+                {
+                    "type": "refactor",
+                    "section": "Code Refactoring"
+                },
+                {
+                    "type": "perf",
+                    "section": "Performance Improvements"
+                }
             ]
         }
     }
