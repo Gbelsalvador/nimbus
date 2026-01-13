@@ -17,6 +17,9 @@ jobs:
         id: release
         with:
           token: ${{ secrets.CI_TOKEN }}
+          target-branch: base
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
       # Handle the PR artifacts while the PR is open/updated
       # The output 'pr' is only present if a release PR was created or updated.
