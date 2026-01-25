@@ -191,7 +191,7 @@ const openShareableLinkDialog = () => {
                     {{ method || 'Select a Method' }}
                 </AppSelectValue>
             </AppSelectTrigger>
-            <AppSelectContent>
+            <AppSelectContent :align-offset="2">
                 <AppSelectGroup v-if="currentRouteSupportedMethods.length">
                     <AppSelectLabel>Supported</AppSelectLabel>
                     <AppSelectItem
