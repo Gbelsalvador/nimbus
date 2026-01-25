@@ -1,23 +1,39 @@
 <script setup lang="ts">
+/**
+ * @component RequestAuthorizationNone
+ * @description Info panel indicating no authentication is being used.
+ */
 import {
-    AppCard,
-    AppCardDescription,
-    AppCardHeader,
-    AppCardTitle,
-} from '@/components/base/card';
+    AppPanel,
+    AppPanelDescription,
+    AppPanelHeader,
+    AppPanelTitle,
+} from '@/components/base/panel';
 import { LockKeyholeOpenIcon } from 'lucide-vue-next';
+
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppRequestAuthorizationNoneProps {}
+
+/*
+ * Component Setup.
+ */
+
+defineProps<AppRequestAuthorizationNoneProps>();
 </script>
 
 <template>
-    <AppCard
-        class="px-panel bg-background relative flex items-start gap-2 rounded-none border-0 border-b py-4 shadow-none"
-    >
-        <LockKeyholeOpenIcon />
-        <AppCardHeader class="p-0">
-            <AppCardTitle>No Authorization</AppCardTitle>
-            <AppCardDescription>
-                You're performing the request as a guest.
-            </AppCardDescription>
-        </AppCardHeader>
-    </AppCard>
+    <AppPanel class="border-b shadow-none">
+        <AppPanelHeader class="items-start">
+            <LockKeyholeOpenIcon class="size-5 min-w-5" />
+            <div class="flex flex-col">
+                <AppPanelTitle>No Authorization</AppPanelTitle>
+                <AppPanelDescription>
+                    You're performing the request as a guest.
+                </AppPanelDescription>
+            </div>
+        </AppPanelHeader>
+    </AppPanel>
 </template>

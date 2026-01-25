@@ -6,6 +6,10 @@ import { setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick } from 'vue';
 
+/*
+ * Fixtures.
+ */
+
 describe('useRequestAuthorization', () => {
     let requestStore: ReturnType<typeof useRequestStore>;
 
@@ -27,78 +31,110 @@ describe('useRequestAuthorization', () => {
         requestStore = useRequestStore();
     });
 
-    it('initializes with current request authorization', () => {
-        const { authorization } = useRequestAuthorization();
+    /*
+     * Initialization tests.
+     */
 
-        expect(authorization.value.type).toBe(AuthorizationType.None);
-    });
+    describe('Initialization', () => {
+        it('initializes with current request authorization', () => {
+            // Act
 
-    it('initializes with default authorization if not set in store', () => {
-        // @ts-expect-error Attempt to assign to const or readonly variable
-        requestStore.pendingRequestData = null;
+            const { authorization } = useRequestAuthorization();
 
-        const { authorization } = useRequestAuthorization();
+            // Assert
 
-        expect(authorization.value.type).toBe(AuthorizationType.CurrentUser);
-    });
-
-    it('switches between authorization types and restores cached state', async () => {
-        const {
-            authorization,
-            updateAuthorizationType,
-            updateCurrentAuthorizationValue,
-        } = useRequestAuthorization();
-
-        // Switch to Bearer
-        updateAuthorizationType(AuthorizationType.Bearer);
-        await nextTick();
-
-        // Set value
-        updateCurrentAuthorizationValue('token');
-        await nextTick();
-
-        expect(authorization.value).toEqual({
-            type: AuthorizationType.Bearer,
-            value: 'token',
-        });
-
-        // Switch to Basic
-        updateAuthorizationType(AuthorizationType.Basic);
-        await nextTick();
-
-        expect(authorization.value.type).toBe(AuthorizationType.Basic);
-        expect(authorization.value.value).toEqual({ username: '', password: '' });
-
-        // Switch back to Bearer - should restore 'token'
-        updateAuthorizationType(AuthorizationType.Bearer);
-        await nextTick();
-
-        expect(authorization.value).toEqual({
-            type: AuthorizationType.Bearer,
-            value: 'token',
+            expect(authorization.value.type).toBe(AuthorizationType.None);
         });
     });
 
-    it('persists authorization back to the request store via actions', async () => {
-        const { updateAuthorizationType, updateCurrentAuthorizationValue } =
-            useRequestAuthorization();
+    /*
+     * State Transition tests.
+     */
 
-        const spy = vi.spyOn(requestStore, 'updateAuthorization');
+    describe('Behavior', () => {
+        it('initializes with default authorization if not set in store', () => {
+            // @ts-expect-error Attempt to assign to const or readonly variable
+            requestStore.pendingRequestData = null;
 
-        // Switch to Bearer
-        updateAuthorizationType(AuthorizationType.Bearer);
-        await nextTick();
+            const { authorization } = useRequestAuthorization();
 
-        // Set value
-        updateCurrentAuthorizationValue('token');
-        await nextTick();
+            expect(authorization.value.type).toBe(AuthorizationType.CurrentUser);
+        });
 
-        // Check if it was called with the final expected state
-        expect(spy).toHaveBeenCalledWith(
-            expect.objectContaining({
+        it('switches between authorization types and restores cached state', async () => {
+            // Arrange
+
+            const {
+                authorization,
+                updateAuthorizationType,
+                updateCurrentAuthorizationValue,
+            } = useRequestAuthorization();
+
+            // Act
+
+            // Switch to Bearer
+            updateAuthorizationType(AuthorizationType.Bearer);
+            await nextTick();
+            updateCurrentAuthorizationValue('token');
+            await nextTick();
+
+            // Assert
+
+            expect(authorization.value).toEqual({
                 type: AuthorizationType.Bearer,
                 value: 'token',
-            }),
-        );
+            });
+
+            // Act
+
+            // Switch to Basic
+            updateAuthorizationType(AuthorizationType.Basic);
+            await nextTick();
+
+            // Assert
+
+            expect(authorization.value.type).toBe(AuthorizationType.Basic);
+
+            // Act
+
+            // Switch back to Bearer - should restore 'token'
+            updateAuthorizationType(AuthorizationType.Bearer);
+            await nextTick();
+
+            // Assert
+
+            expect(authorization.value).toEqual({
+                type: AuthorizationType.Bearer,
+                value: 'token',
+            });
+        });
+
+        it('persists authorization back to the request store via actions', async () => {
+            // Arrange
+
+            const { updateAuthorizationType, updateCurrentAuthorizationValue } =
+                useRequestAuthorization();
+
+            const spy = vi.spyOn(requestStore, 'updateAuthorization');
+
+            // Act
+
+            // Switch to Bearer
+            updateAuthorizationType(AuthorizationType.Bearer);
+            await nextTick();
+
+            // Set value
+            updateCurrentAuthorizationValue('token');
+            await nextTick();
+
+            // Assert
+
+            expect(spy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: AuthorizationType.Bearer,
+                    value: 'token',
+                }),
+            );
+        });
     });
 });

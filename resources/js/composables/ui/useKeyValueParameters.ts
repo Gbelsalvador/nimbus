@@ -1,8 +1,29 @@
 import { keyValueParametersConfig } from '@/config';
-import { ParameterContract } from '@/interfaces/ui';
+import type { ParameterContract } from '@/interfaces/ui';
 import { ParameterType } from '@/interfaces/ui/key-value-parameters';
 import { useCounter, watchDebounced } from '@vueuse/core';
-import { computed, onBeforeMount, reactive, ref, Ref, watch } from 'vue';
+import {
+    type ComputedRef,
+    type Ref,
+    computed,
+    onBeforeMount,
+    reactive,
+    ref,
+    watch,
+} from 'vue';
+
+export interface UseKeyValueParametersResult<T extends ParameterContract> {
+    parameters: Ref<T[]>;
+    deletingAll: ComputedRef<boolean>;
+    areAllParametersDisabled: ComputedRef<boolean>;
+    addNewEmptyParameter: () => void;
+    toggleAllParametersEnabledState: () => void;
+    triggerParameterDeletion: (index: number) => void;
+    deleteAllParameters: () => void;
+    updateParametersFromParentModel: () => void;
+    isParameterMarkedForDeletion: (id: number) => boolean;
+    clearAllDeletionStates: () => void;
+}
 
 /**
  * Manages key-value parameter state with unidirectional data flow.
@@ -10,13 +31,33 @@ import { computed, onBeforeMount, reactive, ref, Ref, watch } from 'vue';
  * @param modelValue - The current parameters from the parent (read-only)
  * @param onUpdate - Callback to notify parent of parameter changes
  */
-export function useKeyValueParameters(
-    modelValue: Ref<ParameterContract[]>,
-    onUpdate: (parameters: ParameterContract[]) => void,
-) {
+export function useKeyValueParameters<T extends ParameterContract>(
+    modelValue: Ref<T[]>,
+    onUpdate: (parameters: T[]) => void,
+): UseKeyValueParametersResult<T> {
+    /*
+     * Dependencies.
+     */
+
     const { count: nextParameterId, inc: incrementParametersId } = useCounter();
 
-    const parameters: Ref<ParameterContract[]> = ref([]);
+    /*
+     * State.
+     */
+
+    const parameters: Ref<T[]> = ref([]);
+
+    interface DeletionState {
+        deleting: boolean;
+        timeoutId?: number;
+    }
+
+    const deletionStatesForParameters = reactive(new Map<number, DeletionState>());
+    const bulkDeletionState: Ref<DeletionState> = ref({ deleting: false });
+
+    /*
+     * Utilities.
+     */
 
     const createParameterSkeleton = (id: number): ParameterContract => ({
         type: ParameterType.Text,
@@ -25,19 +66,6 @@ export function useKeyValueParameters(
         value: '',
         enabled: true,
     });
-
-    /*
-     * Deletion state management.
-     */
-
-    interface DeletionState {
-        deleting: boolean;
-        timeoutId?: number;
-    }
-
-    const deletionStatesForParameters = reactive(new Map<number, DeletionState>());
-
-    const bulkDeletionState: Ref<DeletionState> = ref({ deleting: false });
 
     /**
      * Initiates deletion confirmation for a parameter.
@@ -81,7 +109,7 @@ export function useKeyValueParameters(
      * Sets deletion state with automatic timeout.
      */
     const setParameterDeletionState = (parameterId: number): void => {
-        const timeoutId: number = window.setTimeout(() => {
+        const timeoutId = window.setTimeout(() => {
             deletionStatesForParameters.delete(parameterId);
         }, keyValueParametersConfig.DELETION_CONFIRMATION_TIMEOUT);
 
@@ -144,16 +172,6 @@ export function useKeyValueParameters(
         clearBulkDeletionState();
     };
 
-    /*
-     * Computed.
-     */
-
-    const areAllParametersDisabled = computed(() =>
-        parameters.value.every(parameter => !parameter.enabled),
-    );
-
-    const deletingAll = computed(() => isBulkDeletionMarked());
-
     /**
      * Reconciliation logic to update internal parameters from the parent modelValue.
      *
@@ -168,7 +186,7 @@ export function useKeyValueParameters(
             parameters.value.map(parameter => [parameter.id, parameter]),
         );
 
-        const nextParameters: ParameterContract[] = incoming.map(external => {
+        const nextParameters: T[] = incoming.map(external => {
             const existing = currentById.get(external.id);
 
             if (existing) {
@@ -181,19 +199,19 @@ export function useKeyValueParameters(
                     value: external.value,
                     type: external.type,
                     enabled: external.enabled,
-                };
+                } as T;
             }
 
             incrementParametersId();
 
-            return { id: nextParameterId.value, ...external };
-        });
+            return { id: nextParameterId.value, ...external } as T;
+        }) as T[];
 
         // If internal state is empty, we must ensure at least one skeleton
         if (nextParameters.length === 0) {
             incrementParametersId();
 
-            nextParameters.push(createParameterSkeleton(nextParameterId.value));
+            nextParameters.push(createParameterSkeleton(nextParameterId.value) as T);
         }
 
         // Only update if the resulting content is different from current internal state
@@ -217,8 +235,85 @@ export function useKeyValueParameters(
             enabled: p.enabled,
         }));
 
-        onUpdate(clonedParameters);
+        onUpdate(clonedParameters as T[]);
     };
+
+    /*
+     * Computed.
+     */
+
+    const areAllParametersDisabled = computed(() =>
+        parameters.value.every(parameter => !parameter.enabled),
+    );
+
+    const deletingAll = computed(() => isBulkDeletionMarked());
+
+    /*
+     * Actions.
+     */
+
+    /**
+     * Adds a new empty parameter to the list for user input.
+     */
+    const addNewEmptyParameter = (): void => {
+        incrementParametersId();
+
+        const newParameter = createParameterSkeleton(nextParameterId.value);
+
+        parameters.value.push(newParameter as T);
+    };
+
+    /**
+     * Toggles all parameters between enabled/disabled states.
+     */
+    const toggleAllParametersEnabledState = () => {
+        const shouldEnableAll = areAllParametersDisabled.value;
+
+        parameters.value.forEach(
+            (parameter: ParameterContract) => (parameter.enabled = shouldEnableAll),
+        );
+    };
+
+    /**
+     * Handles two-step deletion confirmation for individual parameters.
+     *
+     * Prevents accidental deletions by requiring a second click within the configured timeout.
+     * First click marks for deletion, second click removes immediately.
+     */
+    const triggerParameterDeletion = (index: number): void => {
+        const parameter = parameters.value[index];
+
+        if (!parameter) {
+            return;
+        }
+
+        const shouldDelete = initiateParameterDeletion(index);
+
+        if (!shouldDelete) {
+            return;
+        }
+
+        parameters.value.splice(index, 1);
+    };
+
+    /**
+     * Handles two-step deletion confirmation for all parameters.
+     *
+     * Prevents accidental bulk deletion by requiring confirmation within the configured timeout.
+     */
+    const deleteAllParameters = (): void => {
+        const shouldDelete = initiateBulkDeletion();
+
+        if (!shouldDelete) {
+            return;
+        }
+
+        parameters.value = [];
+    };
+
+    /*
+     * Watchers.
+     */
 
     // Watch for internal changes to notify parent
     watchDebounced(
@@ -241,6 +336,10 @@ export function useKeyValueParameters(
         { deep: true },
     );
 
+    /*
+     * Lifecycle.
+     */
+
     // Initialize parameters from parent model
     onBeforeMount(() => {
         updateParametersFromParentModel();
@@ -249,75 +348,6 @@ export function useKeyValueParameters(
             addNewEmptyParameter();
         }
     });
-
-    /**
-     * Adds a new empty parameter to the list for user input.
-     */
-    const addNewEmptyParameter = (): void => {
-        incrementParametersId();
-
-        const newParameter = createParameterSkeleton(nextParameterId.value);
-
-        parameters.value.push(newParameter);
-    };
-
-    /**
-     * Toggles all parameters between enabled/disabled states.
-     */
-    const toggleAllParametersEnabledState = () => {
-        const shouldEnableAll = areAllParametersDisabled.value;
-
-        parameters.value.forEach(
-            (parameter: ParameterContract) => (parameter.enabled = shouldEnableAll),
-        );
-    };
-
-    /**
-     * Handles two-step deletion confirmation for individual parameters.
-     *
-     * Prevents accidental deletions by requiring a second click within the configured timeout.
-     * First click marks for deletion, second click removes immediately.
-     */
-    const triggerParameterDeletion = (
-        parameters: ParameterContract[],
-        index: number,
-    ): void => {
-        const parameter = parameters[index];
-
-        if (!parameter) {
-            return;
-        }
-
-        const shouldDelete = initiateParameterDeletion(index);
-
-        if (!shouldDelete) {
-            return;
-        }
-
-        parameters.splice(index, 1);
-    };
-
-    /**
-     * Handles two-step deletion confirmation for all parameters.
-     *
-     * Prevents accidental bulk deletion by requiring confirmation within the configured timeout.
-     */
-    const deleteAllParameters = (): void => {
-        const shouldDelete = initiateBulkDeletion();
-
-        if (!shouldDelete) {
-            return;
-        }
-
-        parameters.value = [];
-    };
-
-    /**
-     * Checks if a parameter is marked for deletion
-     */
-    const checkParameterDeletion = (id: number): boolean => {
-        return isParameterMarkedForDeletion(id);
-    };
 
     return {
         // State
@@ -333,7 +363,7 @@ export function useKeyValueParameters(
         updateParametersFromParentModel,
 
         // Utilities
-        isParameterMarkedForDeletion: checkParameterDeletion,
+        isParameterMarkedForDeletion,
         clearAllDeletionStates,
     };
 }

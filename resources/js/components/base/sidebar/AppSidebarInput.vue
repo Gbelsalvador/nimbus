@@ -1,19 +1,38 @@
 <script setup lang="ts">
-import { AppInput } from '@/components/base/input';
+/**
+ * @component AppSidebarInput
+ * @description A specialized input component for use within the sidebar.
+ */
+import { AppInput, type InputVariants } from '@/components/base/input';
 import { cn } from '@/utils/ui';
+import { reactiveOmit } from '@vueuse/core';
 import type { HTMLAttributes } from 'vue';
 
-const props = defineProps<{
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppSidebarInputProps {
     class?: HTMLAttributes['class'];
-}>();
+    variant?: InputVariants['variant'];
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppSidebarInputProps>();
+
+const delegatedProps = reactiveOmit(props, 'class');
 </script>
 
 <template>
     <AppInput
         data-sidebar="input"
+        v-bind="delegatedProps"
         :class="
             cn(
-                'focus-visible:ring-sidebar-ring h-8 w-full bg-white shadow-none focus-visible:ring-2 dark:bg-zinc-950',
+                'h-8 w-full bg-white shadow-none focus-visible:ring-0 dark:bg-zinc-950',
                 props.class,
             )
         "

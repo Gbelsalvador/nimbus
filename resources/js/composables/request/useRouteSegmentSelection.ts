@@ -1,5 +1,4 @@
-// composables/useRouteSegmentSelection.ts
-import { nextTick, ref, Ref, watch } from 'vue';
+import { type DeepReadonly, type Ref, nextTick, readonly, ref, watch } from 'vue';
 
 export interface UseRouteSegmentSelectionOptions {
     /**
@@ -8,7 +7,7 @@ export interface UseRouteSegmentSelectionOptions {
     endpoint: Ref<string>;
 }
 
-export interface UseRouteSegmentSelectionReturn {
+export interface UseRouteSegmentSelectionResult {
     /**
      * Handler to be attached to the input's click event
      */
@@ -22,7 +21,7 @@ export interface UseRouteSegmentSelectionReturn {
     /**
      * The indices of segments that were originally variables
      */
-    variableSegmentIndices: Ref<number[]>;
+    variableSegmentIndices: DeepReadonly<Ref<number[]>>;
 }
 
 interface SegmentPosition {
@@ -49,10 +48,22 @@ interface SegmentPosition {
  */
 export function useRouteSegmentSelection(
     options: UseRouteSegmentSelectionOptions,
-): UseRouteSegmentSelectionReturn {
+): UseRouteSegmentSelectionResult {
+    /*
+     * Dependencies.
+     */
+
     const { endpoint } = options;
 
+    /*
+     * State.
+     */
+
     const variableSegmentIndices = ref<number[]>([]);
+
+    /*
+     * Utilities.
+     */
 
     /**
      * Identifies which segments in a URL path are variables (wrapped in braces).
@@ -233,6 +244,10 @@ export function useRouteSegmentSelection(
         });
     };
 
+    /*
+     * Actions.
+     */
+
     /**
      * Handles click events on the input to auto-select route segments.
      * Priority: 1) Segments with braces, 2) Segments that were originally variables
@@ -264,6 +279,10 @@ export function useRouteSegmentSelection(
         }
     };
 
+    /*
+     * Watchers.
+     */
+
     // Watch for endpoint changes to track variable segments
     watch(
         endpoint,
@@ -278,8 +297,11 @@ export function useRouteSegmentSelection(
     );
 
     return {
+        // Actions
         handleClick,
         identifyVariableSegments,
-        variableSegmentIndices,
+
+        // State
+        variableSegmentIndices: readonly(variableSegmentIndices),
     };
 }

@@ -1,4 +1,4 @@
-import { DumpValueType } from '@/interfaces/generated/dump-value-types';
+import type { DumpValueType } from '@/interfaces/generated/dump-value-types';
 
 export interface ArrayDump {
     type: DumpValueType.Array;
@@ -65,12 +65,12 @@ export interface ObjectDumpProperty {
 }
 
 export const styles = {
-    key: 'text-green-600 dark:text-green-400 font-mono text-xs',
-    numericalKey: 'text-blue-600 font-mono text-xs',
-    objectProperty: 'text-zinc-600 dark:text-zinc-400 font-mono text-xs',
-    value: 'text-xs text-zinc-900 dark:text-zinc-50 font-mono',
-    stringValue: 'text-xs text-green-600 dark:text-green-400 font-mono',
-    meta: 'text-zinc-600 dark:text-zinc-400',
+    key: 'text-success font-mono text-xs',
+    numericalKey: 'text-info font-mono text-xs',
+    objectProperty: 'text-subtle-foreground font-mono text-xs',
+    value: 'text-foreground font-mono text-xs',
+    stringValue: 'text-success font-mono text-xs',
+    meta: 'text-subtle-foreground',
 };
 
 export { default as ConstDumpRenderer } from './ConstDumpRenderer.vue';

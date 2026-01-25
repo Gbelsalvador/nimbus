@@ -1,5 +1,10 @@
 <script setup lang="ts">
+/**
+ * @component AppSelectTrigger
+ * @description The interactive element that opens the select menu.
+ */
 import { cn } from '@/utils/ui';
+import { reactiveOmit } from '@vueuse/core';
 import { ChevronDown } from 'lucide-vue-next';
 import {
     SelectIcon,
@@ -7,28 +12,41 @@ import {
     type SelectTriggerProps,
     useForwardProps,
 } from 'reka-ui';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes } from 'vue';
+import { selectTriggerVariants, type SelectTriggerVariants } from './index';
 
-const props = defineProps<SelectTriggerProps & { class?: HTMLAttributes['class'] }>();
-
-const delegatedProps = computed(() => {
-    const { class: _, ...delegated } = props;
-
-    return delegated;
+defineOptions({
+    inheritAttrs: false,
 });
+
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppSelectTriggerProps extends SelectTriggerProps {
+    class?: HTMLAttributes['class'];
+    variant?: SelectTriggerVariants['variant'];
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppSelectTriggerProps>();
+
+/*
+ * Computed & Methods.
+ */
+
+const delegatedProps = reactiveOmit(props, 'class', 'variant');
 
 const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
     <SelectTrigger
-        v-bind="forwardedProps"
-        :class="
-            cn(
-                'flex h-9 items-center justify-between rounded-md border border-zinc-200 bg-transparent px-3 py-2 text-start text-sm whitespace-nowrap shadow-sm ring-offset-white focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[placeholder]:text-zinc-500 dark:border-zinc-800 dark:data-[placeholder]:text-zinc-400 [&>span]:truncate',
-                props.class,
-            )
-        "
+        v-bind="{ ...forwardedProps, ...$attrs }"
+        :class="cn(selectTriggerVariants({ variant }), props.class)"
     >
         <slot />
         <SelectIcon as-child>

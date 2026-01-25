@@ -22,7 +22,8 @@ import { useResponsiveResizable } from '@/composables/ui/useResponsiveResizable'
 import { useRoutesStore } from '@/stores';
 import { useTimeAgo } from '@vueuse/core';
 import { ClockIcon, RadioIcon, RefreshCwIcon } from 'lucide-vue-next';
-import { computed, onBeforeMount, ref, TemplateRef, useTemplateRef } from 'vue';
+import type { TemplateRef } from 'vue';
+import { computed, onBeforeMount, ref, useTemplateRef } from 'vue';
 import { useRouter } from 'vue-router';
 
 defineOptions({
@@ -103,7 +104,7 @@ const mainDirection = useResponsiveResizable([600], panelsGroupElement).threshol
         <template #header-actions>
             <div
                 v-if="lastSyncTime"
-                class="xs:block text-muted-foreground mr-3 hidden text-xs"
+                class="xs:block text-subtle-foreground mr-3 hidden text-xs"
             >
                 <ClockIcon class="mr-1 inline size-3" />
                 <span>{{ timeAgo }}</span>

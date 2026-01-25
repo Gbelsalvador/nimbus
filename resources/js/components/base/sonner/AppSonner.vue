@@ -1,4 +1,8 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+/**
+ * @component AppSonner
+ * @description A toast notification container using vue-sonner.
+ */
 import { inject } from 'vue';
 import type { ToasterProps } from 'vue-sonner';
 import { Toaster as Sonner } from 'vue-sonner';
@@ -7,7 +11,17 @@ defineOptions({
     name: 'AppSonner',
 });
 
-const props = defineProps<ToasterProps>();
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppSonnerProps extends ToasterProps {}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppSonnerProps>();
 
 const appTheme = inject<'dark' | 'light'>('theme');
 </script>

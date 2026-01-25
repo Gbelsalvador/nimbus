@@ -1,6 +1,6 @@
 import { httpClientConfig } from '@/config';
-import { ParameterContract, RequestHeader } from '@/interfaces';
-import {
+import type { ParameterContract, RequestHeader } from '@/interfaces';
+import type {
     HttpHeaders,
     PendingRequest,
     RelayProxyResponse,
@@ -9,19 +9,42 @@ import {
 import { useConfigStore } from '@/stores';
 import { convertPayloadToFormData, getStatusGroup } from '@/utils/http';
 import { generateContentTypeHeader } from '@/utils/request/content-type-header-generator';
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import { readonly, ref } from 'vue';
+import type { AxiosError, AxiosResponse } from 'axios';
+import axios from 'axios';
+import { type DeepReadonly, type Ref, readonly, ref } from 'vue';
 
 export interface RequestResult {
     response: Response;
     duration: number;
 }
 
-export function useHttpClient() {
+export interface UseHttpClientResult {
+    executeRequest: (request: PendingRequest) => Promise<RequestResult | null>;
+    cancelCurrentRequest: () => void;
+    buildRequestUrl: (request: PendingRequest) => string;
+    isExecuting: DeepReadonly<Ref<boolean>>;
+}
+
+/**
+ * Composable for handling HTTP requests through the relay proxy.
+ */
+export function useHttpClient(): UseHttpClientResult {
+    /*
+     * Dependencies.
+     */
+
     const configStore = useConfigStore();
+
+    /*
+     * State.
+     */
 
     const abortController = ref<AbortController | null>(null);
     const isExecuting = ref(false);
+
+    /*
+     * Utilities.
+     */
 
     const buildRequestUrl = (request: PendingRequest): string => {
         const baseUrl = configStore.apiUrl;
@@ -42,6 +65,18 @@ export function useHttpClient() {
             });
 
         return url.toString();
+    };
+
+    /**
+     * Body is memoized by method > payload type structure for better UX (keep-alive state).
+     */
+    const getMemoizedBody = (request: PendingRequest) => {
+        // First extraction: get body for the specific HTTP method (GET, POST, etc.)
+        const body = request.body[request.method] ?? null;
+
+        // Second extraction: get body for the specific payload type (JSON, FormData, etc.)
+        // This double extraction is necessary due to the nested memoization structure
+        return body ? (body[request.payloadType] ?? null) : null;
     };
 
     const createRelayPayload = (request: PendingRequest) => {
@@ -69,18 +104,6 @@ export function useHttpClient() {
             authorization: request.authorization,
             body: getMemoizedBody(request),
         };
-    };
-
-    /**
-     * Body is memoized by method > payload type structure for better UX (keep-alive state).
-     */
-    const getMemoizedBody = (request: PendingRequest) => {
-        // First extraction: get body for the specific HTTP method (GET, POST, etc.)
-        const body = request.body[request.method] ?? null;
-
-        // Second extraction: get body for the specific payload type (JSON, FormData, etc.)
-        // This double extraction is necessary due to the nested memoization structure
-        return body ? (body[request.payloadType] ?? null) : null;
     };
 
     const transformRelayResponse = (relayResponse: RelayProxyResponse): Response => {
@@ -160,6 +183,10 @@ export function useHttpClient() {
         });
     };
 
+    /*
+     * Actions.
+     */
+
     const cancelCurrentRequest = () => {
         if (!abortController.value) {
             return;
@@ -196,9 +223,12 @@ export function useHttpClient() {
     };
 
     return {
+        // Actions
         executeRequest,
         cancelCurrentRequest,
         buildRequestUrl,
+
+        // State
         isExecuting: readonly(isExecuting),
     };
 }

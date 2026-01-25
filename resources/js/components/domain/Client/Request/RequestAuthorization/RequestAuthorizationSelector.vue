@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component RequestAuthorizationSelector
+ * @description A dropdown selector for choosing the authentication method.
+ */
 import {
     AppSelect,
     AppSelectContent,
@@ -8,20 +12,28 @@ import {
     AppSelectTrigger,
     AppSelectValue,
 } from '@/components/base/select';
-import { AuthorizationType, AuthorizationTypeItem } from '@/interfaces/generated';
+import { AuthorizationType, type AuthorizationTypeItem } from '@/interfaces/generated';
 import { useRequestStore, useSettingsStore } from '@/stores';
 import { watchOnce } from '@vueuse/core';
 import { SparklesIcon } from 'lucide-vue-next';
-import { computed, ModelRef } from 'vue';
+import { computed, type ModelRef } from 'vue';
 
-interface Props {
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppRequestAuthorizationSelectorProps {
     types: {
         special: readonly AuthorizationTypeItem[];
         traditional: readonly AuthorizationTypeItem[];
     };
 }
 
-const props = defineProps<Props>();
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppRequestAuthorizationSelectorProps>();
 
 const model: ModelRef<AuthorizationType> = defineModel<AuthorizationType>({
     default: () => AuthorizationType.CurrentUser,
@@ -33,6 +45,10 @@ const model: ModelRef<AuthorizationType> = defineModel<AuthorizationType>({
 
 const requestStore = useRequestStore();
 const settingsStore = useSettingsStore();
+
+/*
+ * Computed & Watchers.
+ */
 
 const pendingRequestData = computed(() => requestStore.pendingRequestData);
 
@@ -49,7 +65,7 @@ watchOnce(
 
 <template>
     <div class="flex items-center">
-        <span class="text-muted-foreground w-[120px] text-xs">Authorization Type:</span>
+        <span class="text-subtle-foreground w-[120px] text-xs">Authorization Type:</span>
         <AppSelect v-model="model">
             <AppSelectTrigger
                 class="min-w-[120px] rounded-none border-0 text-xs shadow-none focus:ring-0"

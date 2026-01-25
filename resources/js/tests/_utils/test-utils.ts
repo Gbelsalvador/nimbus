@@ -1,10 +1,12 @@
 import userEvent from '@testing-library/user-event';
-import { render, RenderOptions, screen } from '@testing-library/vue';
-import type { MountingOptions } from '@vue/test-utils';
-import { mount, VueWrapper } from '@vue/test-utils';
+import type { RenderOptions } from '@testing-library/vue';
+import { render, screen } from '@testing-library/vue';
+import type { MountingOptions, VueWrapper } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import { Component } from 'vue';
-import { createRouter, createWebHistory, Router } from 'vue-router';
+import type { Component } from 'vue';
+import type { Router } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 export interface RenderWithProvidersOptions extends RenderOptions<unknown> {
     router?: Router;
@@ -36,7 +38,7 @@ export function createMockRouter(): Router {
 export function renderWithProviders(
     component: Component,
     options: RenderWithProvidersOptions = {},
-) {
+): ReturnType<typeof render> & { user: ReturnType<typeof userEvent.setup> } {
     const pinia = createPinia();
     setActivePinia(pinia);
 

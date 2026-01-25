@@ -1,19 +1,31 @@
 <script setup lang="ts">
-defineOptions({
-    name: 'PageLayout',
-});
+/**
+ * @component PageLayout
+ * @description The main structural layout for application pages, including header, subheader, and content area.
+ */
+import { type Component } from 'vue';
 
-import type { Component } from 'vue';
+/*
+ * Types & Interfaces.
+ */
 
-interface Props {
+export interface AppPageLayoutProps {
     title: string;
     icon?: Component;
     scrollable?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+/*
+ * Component Setup.
+ */
+
+withDefaults(defineProps<AppPageLayoutProps>(), {
     scrollable: true,
     icon: undefined,
+});
+
+defineOptions({
+    name: 'PageLayout',
 });
 </script>
 
@@ -33,7 +45,7 @@ withDefaults(defineProps<Props>(), {
 
         <!-- Sub Header -->
         <div
-            class="px-panel h-sub-toolbar bg-subtle-background flex items-center justify-between border-b"
+            class="px-panel h-sub-toolbar bg-subtle flex items-center justify-between border-b"
         >
             <slot name="subheader-left" />
             <slot name="subheader-right" />

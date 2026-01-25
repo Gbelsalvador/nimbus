@@ -1,14 +1,34 @@
 <script setup lang="ts">
+/**
+ * @component ConfigReadonlySection
+ * @description A read-only display of the current application configuration.
+ */
 import { AppLabel } from '@/components/base/label';
 import { useConfigStore } from '@/stores';
 import { GlobeIcon, RouteIcon, ShieldIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
 
-defineOptions({
-    name: 'ConfigReadonlySection',
-});
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppConfigReadonlySectionProps {}
+
+/*
+ * Component Setup.
+ */
+
+defineProps<AppConfigReadonlySectionProps>();
+
+/*
+ * Stores.
+ */
 
 const configStore = useConfigStore();
+
+/*
+ * Computed & Methods.
+ */
 
 const configData = computed(() => ({
     routePrefix: 'api',
@@ -29,7 +49,7 @@ const configData = computed(() => ({
                         <RouteIcon class="h-4 w-4" />
                         <h3 class="text-sm font-medium">Route Configuration</h3>
                     </div>
-                    <p class="text-muted-foreground text-xs">
+                    <p class="text-subtle-foreground text-xs">
                         API routing settings including prefix and versioning
                         configuration.
                     </p>
@@ -39,29 +59,29 @@ const configData = computed(() => ({
                 <div class="rounded-lg border p-3.5">
                     <div class="grid gap-2 sm:grid-cols-2 sm:gap-6">
                         <div class="space-y-2">
-                            <AppLabel class="text-muted-foreground text-xs">
+                            <AppLabel class="text-subtle-foreground text-xs">
                                 Route Prefix
                             </AppLabel>
                             <div
-                                class="flex h-9 items-center rounded bg-zinc-100 px-3 font-mono text-sm dark:bg-zinc-900"
+                                class="bg-subtle flex h-9 items-center rounded px-3 font-mono text-sm"
                             >
                                 {{ configData.routePrefix }}
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <AppLabel class="text-muted-foreground text-xs">
+                            <AppLabel class="text-subtle-foreground text-xs">
                                 Versioned
                             </AppLabel>
                             <div
-                                class="flex h-9 items-center rounded bg-zinc-100 px-3 text-sm dark:bg-zinc-900"
+                                class="bg-subtle flex h-9 items-center rounded px-3 text-sm"
                             >
                                 <div class="flex items-center space-x-2">
                                     <div
                                         :class="
                                             configData.isVersioned
-                                                ? 'bg-green-500'
-                                                : 'bg-gray-400'
+                                                ? 'bg-success'
+                                                : 'bg-subtle-foreground'
                                         "
                                         class="h-2 w-2 rounded-full"
                                     ></div>
@@ -88,7 +108,7 @@ const configData = computed(() => ({
                         <GlobeIcon class="h-4 w-4" />
                         <h3 class="text-sm font-medium">API Configuration</h3>
                     </div>
-                    <p class="text-muted-foreground text-xs">
+                    <p class="text-subtle-foreground text-xs">
                         Base URL and path settings for API endpoints.
                     </p>
                 </div>
@@ -97,22 +117,22 @@ const configData = computed(() => ({
                 <div class="rounded-lg border p-3.5">
                     <div class="grid gap-2 sm:grid-cols-2 sm:gap-6">
                         <div class="space-y-2">
-                            <AppLabel class="text-muted-foreground text-xs">
+                            <AppLabel class="text-subtle-foreground text-xs">
                                 Base URL
                             </AppLabel>
                             <div
-                                class="flex h-9 items-center rounded bg-zinc-100 px-3 font-mono text-sm dark:bg-zinc-900"
+                                class="bg-subtle flex h-9 items-center rounded px-3 font-mono text-sm"
                             >
                                 {{ configData.baseUrl }}
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <AppLabel class="text-muted-foreground text-xs">
+                            <AppLabel class="text-subtle-foreground text-xs">
                                 Base Path
                             </AppLabel>
                             <div
-                                class="flex h-9 items-center rounded bg-zinc-100 px-3 font-mono text-sm dark:bg-zinc-900"
+                                class="bg-subtle flex h-9 items-center rounded px-3 font-mono text-sm"
                             >
                                 {{ configData.basePath || 'None' }}
                             </div>
@@ -130,7 +150,7 @@ const configData = computed(() => ({
                         <ShieldIcon class="h-4 w-4" />
                         <h3 class="text-sm font-medium">Global Headers</h3>
                     </div>
-                    <p class="text-muted-foreground text-xs">
+                    <p class="text-subtle-foreground text-xs">
                         Headers automatically included with all API requests.
                     </p>
                 </div>
@@ -141,19 +161,19 @@ const configData = computed(() => ({
                         <div
                             v-for="header in configData.globalHeaders"
                             :key="header.header"
-                            class="flex items-center justify-between rounded bg-zinc-100 p-3.5 dark:bg-zinc-900"
+                            class="bg-subtle flex items-center justify-between rounded p-3.5"
                         >
                             <span class="font-mono text-sm">{{ header.header }}</span>
                             <div class="flex items-center space-x-2">
                                 <div
                                     :class="
                                         header.type === 'generator'
-                                            ? 'bg-blue-500'
-                                            : 'bg-gray-500'
+                                            ? 'bg-info'
+                                            : 'bg-subtle-foreground'
                                     "
                                     class="h-2 w-2 rounded-full"
                                 ></div>
-                                <span class="text-muted-foreground text-xs">
+                                <span class="text-subtle-foreground text-xs">
                                     {{
                                         header.type === 'generator'
                                             ? 'Generated'
@@ -166,7 +186,7 @@ const configData = computed(() => ({
 
                     <div
                         v-else
-                        class="text-muted-foreground py-4 text-center text-sm italic"
+                        class="text-subtle-foreground py-4 text-center text-sm italic"
                     >
                         No global headers configured
                     </div>

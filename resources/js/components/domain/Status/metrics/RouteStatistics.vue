@@ -1,18 +1,26 @@
 <script setup lang="ts">
+/**
+ * @component RouteStatistics
+ * @description Displays statistical metrics about the application routes (total, success, errors, error rate).
+ */
 import { ChartAreaIcon, CheckCircleIcon, RouteIcon, XCircleIcon } from 'lucide-vue-next';
 
 /*
- * Props.
+ * Types & Interfaces.
  */
 
-interface Props {
+export interface AppRouteStatisticsProps {
     totalRoutes: number;
     routesWithErrors: number;
     routesWithoutErrors: number;
     errorRate: number;
 }
 
-defineProps<Props>();
+/*
+ * Component Setup.
+ */
+
+defineProps<AppRouteStatisticsProps>();
 </script>
 
 <template>
@@ -22,7 +30,7 @@ defineProps<Props>();
             <RouteIcon class="size-4" />
             <div>
                 <span class="text-sm font-medium">{{ totalRoutes }}</span>
-                <span class="text-muted-foreground ml-1 text-xs">routes</span>
+                <span class="text-subtle-foreground ml-1 text-xs">routes</span>
             </div>
         </div>
 
@@ -31,7 +39,7 @@ defineProps<Props>();
             <CheckCircleIcon class="size-4" />
             <div>
                 <span class="text-sm font-medium">{{ routesWithoutErrors }}</span>
-                <span class="text-muted-foreground ml-1 text-xs">success</span>
+                <span class="text-subtle-foreground ml-1 text-xs">success</span>
             </div>
         </div>
 
@@ -40,7 +48,7 @@ defineProps<Props>();
             <XCircleIcon class="size-4" />
             <div>
                 <span class="text-sm font-medium">{{ routesWithErrors }}</span>
-                <span class="text-muted-foreground ml-1 text-xs">errors</span>
+                <span class="text-subtle-foreground ml-1 text-xs">errors</span>
             </div>
         </div>
 
@@ -49,7 +57,7 @@ defineProps<Props>();
             <ChartAreaIcon class="size-4" />
             <div>
                 <span class="text-sm font-medium">{{ errorRate }}%</span>
-                <span class="text-muted-foreground ml-1 text-xs">error rate</span>
+                <span class="text-subtle-foreground ml-1 text-xs">error rate</span>
             </div>
         </div>
     </div>

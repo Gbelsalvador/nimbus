@@ -1,22 +1,37 @@
 <script setup lang="ts">
+/**
+ * @component AppSelectScrollDownButton
+ * @description A button displayed at the bottom of the select viewport to enable scrolling down.
+ */
 import { cn } from '@/utils/ui';
+import { reactiveOmit } from '@vueuse/core';
 import { ChevronDown } from 'lucide-vue-next';
 import {
     SelectScrollDownButton,
     type SelectScrollDownButtonProps,
     useForwardProps,
 } from 'reka-ui';
-import { computed, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes } from 'vue';
 
-const props = defineProps<
-    SelectScrollDownButtonProps & { class?: HTMLAttributes['class'] }
->();
+/*
+ * Types & Interfaces.
+ */
 
-const delegatedProps = computed(() => {
-    const { class: _, ...delegated } = props;
+export interface AppSelectScrollDownButtonProps extends SelectScrollDownButtonProps {
+    class?: HTMLAttributes['class'];
+}
 
-    return delegated;
-});
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppSelectScrollDownButtonProps>();
+
+/*
+ * Computed & Methods.
+ */
+
+const delegatedProps = reactiveOmit(props, 'class');
 
 const forwardedProps = useForwardProps(delegatedProps);
 </script>

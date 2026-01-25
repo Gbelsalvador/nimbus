@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component ApplicationSwitcher
+ * @description A dropdown component for switching between different applications in a multi-app setup.
+ */
 import {
     AppSelect,
     AppSelectContent,
@@ -10,9 +14,25 @@ import {
 } from '@/components/base/select';
 import { useConfigStore } from '@/stores';
 import { LayersIcon } from 'lucide-vue-next';
-import { AcceptableValue } from 'reka-ui';
+import { type AcceptableValue } from 'reka-ui';
+
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppApplicationSwitcherProps {}
+
+/*
+ * Component Setup.
+ */
+
+defineProps<AppApplicationSwitcherProps>();
 
 const configStore = useConfigStore();
+
+/*
+ * Event Handlers.
+ */
 
 const handleApplicationChange = (applicationKey: AcceptableValue) => {
     if (applicationKey === null) {
@@ -36,7 +56,7 @@ const handleApplicationChange = (applicationKey: AcceptableValue) => {
                 class="px-panel w-full border-none text-xs shadow-none focus:ring-0 active:ring-0"
             >
                 <div class="flex items-center gap-2 overflow-hidden">
-                    <LayersIcon class="text-muted-foreground size-3.5 shrink-0" />
+                    <LayersIcon class="text-subtle-foreground size-3.5 shrink-0" />
                     <AppSelectValue
                         placeholder="Select an application"
                         class="truncate"
@@ -45,7 +65,7 @@ const handleApplicationChange = (applicationKey: AcceptableValue) => {
             </AppSelectTrigger>
             <AppSelectContent>
                 <AppSelectGroup>
-                    <AppSelectLabel>Available Applications</AppSelectLabel>
+                    <AppSelectLabel>Applications</AppSelectLabel>
                     <AppSelectItem
                         v-for="(name, key) in configStore.applications"
                         :key="key"

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component RoutesResourceGroup
+ * @description A collapsible sidebar group for a specific route resource.
+ */
 import {
     AppCollapsible,
     AppCollapsibleContent,
@@ -13,12 +17,23 @@ import { uniquePersistenceKey } from '@/utils/stores';
 import { useStorage } from '@vueuse/core';
 import { ChevronRight, Folder } from 'lucide-vue-next';
 
-const props = defineProps({
-    resource: {
-        type: String,
-        required: true,
-    },
-});
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppRoutesResourceGroupProps {
+    resource: string;
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppRoutesResourceGroupProps>();
+
+/*
+ * State.
+ */
 
 const isOpen = useStorage(
     uniquePersistenceKey(`routes-explorer-resource-${props.resource}-expanded`),
@@ -34,7 +49,9 @@ const isOpen = useStorage(
             @update:open="isOpen = $event"
         >
             <AppCollapsibleTrigger as-child>
-                <AppSidebarMenuButton>
+                <AppSidebarMenuButton
+                    class="focus-visible:bg-sidebar-accent data-[active=true]:focus-visible:bg-sidebar-accent focus-visible:ring-0"
+                >
                     <ChevronRight class="transition-transform" />
                     <Folder />
                     <span

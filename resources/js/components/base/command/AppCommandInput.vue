@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component AppCommandInput
+ * @description The search input field for filtering command items.
+ */
 import { cn } from '@/utils/ui';
 import { reactiveOmit } from '@vueuse/core';
 import { Search } from 'lucide-vue-next';
@@ -11,15 +15,27 @@ defineOptions({
     inheritAttrs: false,
 });
 
-const props = defineProps<
-    ListboxFilterProps & {
-        class?: HTMLAttributes['class'];
-    }
->();
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppCommandInputProps extends ListboxFilterProps {
+    class?: HTMLAttributes['class'];
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppCommandInputProps>();
 
 const delegatedProps = reactiveOmit(props, 'class');
 
 const forwardedProps = useForwardProps(delegatedProps);
+
+/*
+ * Computed & Methods.
+ */
 
 const { filterState } = useCommand();
 </script>
@@ -37,7 +53,7 @@ const { filterState } = useCommand();
             auto-focus
             :class="
                 cn(
-                    'placeholder:text-muted-foreground flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
+                    'placeholder:text-subtle-foreground flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
                     props.class,
                 )
             "

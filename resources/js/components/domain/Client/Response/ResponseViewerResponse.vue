@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component ResponseViewerResponse
+ * @description Renders the successful response details, including body, headers, and cookies.
+ */
 import {
     AppTabs,
     AppTabsContent,
@@ -6,6 +10,7 @@ import {
     AppTabsTrigger,
 } from '@/components/base/tabs';
 import ResponseBody from '@/components/domain/Client/Response/ResponseBody/ResponseBody.vue';
+import ResponseDumpAndDie from '@/components/domain/Client/Response/ResponseBody/ResponseDumpAndDie.vue';
 import ResponseCookies from '@/components/domain/Client/Response/ResponseCookies/ResponseCookies.vue';
 import ResponseHeaders from '@/components/domain/Client/Response/ResponseHeaders/ResponseHeaders.vue';
 import { STATUS } from '@/interfaces/http';
@@ -13,14 +18,38 @@ import { useRequestsHistoryStore, useRequestStore } from '@/stores';
 import { uniquePersistenceKey } from '@/utils/stores';
 import { useStorage } from '@vueuse/core';
 import { computed } from 'vue';
-import ResponseDumpAndDie from './ResponseBody/ResponseDumpAndDie.vue';
+
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppResponseViewerResponseProps {}
+
+/*
+ * Component Setup.
+ */
+
+defineProps<AppResponseViewerResponseProps>();
+
+/*
+ * Stores.
+ */
 
 const historyStore = useRequestsHistoryStore();
 const requestStore = useRequestStore();
-const lastLog = computed(() => historyStore.lastLog);
-const pendingRequestData = computed(() => requestStore.pendingRequestData);
+
+/*
+ * State.
+ */
 
 const tab = useStorage(uniquePersistenceKey('response-viewer-tab'), 'response');
+
+/*
+ * Computed & Methods.
+ */
+
+const lastLog = computed(() => historyStore.lastLog);
+const pendingRequestData = computed(() => requestStore.pendingRequestData);
 </script>
 
 <template>
@@ -34,7 +63,7 @@ const tab = useStorage(uniquePersistenceKey('response-viewer-tab'), 'response');
             class="mt-0 flex h-full flex-col overflow-auto"
             @update:model-value="tab = $event as string"
         >
-            <div class="bg-subtle-background border-b">
+            <div class="bg-subtle border-b">
                 <AppTabsList class="h-toolbar px-panel rounded-none">
                     <AppTabsTrigger value="response" label="Response" />
                     <AppTabsTrigger value="response-headers" label="Headers" />

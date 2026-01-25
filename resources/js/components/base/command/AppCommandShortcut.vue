@@ -1,16 +1,30 @@
 <script setup lang="ts">
+/**
+ * @component AppCommandShortcut
+ * @description Displays keyboard shortcuts for a command item.
+ */
 import { cn } from '@/utils/ui';
 import type { HTMLAttributes } from 'vue';
 
-const props = defineProps<{
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppCommandShortcutProps {
     class?: HTMLAttributes['class'];
-}>();
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppCommandShortcutProps>();
 </script>
 
 <template>
     <span
         data-slot="command-shortcut"
-        :class="cn('text-muted-foreground ml-auto text-xs tracking-widest', props.class)"
+        :class="cn('text-subtle-foreground ml-auto text-xs tracking-widest', props.class)"
     >
         <slot />
     </span>

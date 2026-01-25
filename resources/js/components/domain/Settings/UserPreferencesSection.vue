@@ -1,5 +1,10 @@
 <script setup lang="ts">
+/**
+ * @component UserPreferencesSection
+ * @description Settings section for configuring user-specific application preferences.
+ */
 import { AppLabel } from '@/components/base/label';
+import { AppPanel, AppPanelContent } from '@/components/base/panel';
 import {
     AppSelect,
     AppSelectContent,
@@ -7,18 +12,22 @@ import {
     AppSelectTrigger,
     AppSelectValue,
 } from '@/components/base/select';
-import { AuthorizationType } from '@/interfaces/generated';
-import { RequestBodyTypeEnum } from '@/interfaces/http';
+import { AuthorizationType } from '@/interfaces/generated'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { RequestBodyTypeEnum } from '@/interfaces/http'; // eslint-disable-line @typescript-eslint/consistent-type-imports
 import { useSettingsStore } from '@/stores';
 import { PaletteIcon, ZapIcon } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { toast } from 'vue-sonner';
 
-defineOptions({
-    name: 'UserPreferencesSection',
-});
+/*
+ * Stores.
+ */
 
 const settingsStore = useSettingsStore();
+
+/*
+ * Computed & Methods.
+ */
 
 const preferences = computed(() => settingsStore.preferences);
 
@@ -45,7 +54,7 @@ const updatePreference = <K extends keyof typeof preferences.value>(
         <!--                        <SettingsIcon class="h-4 w-4" />-->
         <!--                        <h3 class="text-sm font-medium">Application Behavior</h3>-->
         <!--                    </div>-->
-        <!--                    <p class="text-muted-foreground text-xs">-->
+        <!--                    <p class="text-subtle-foreground text-xs">-->
         <!--                        Configure how the application behaves on startup and during use.-->
         <!--                    </p>-->
         <!--                </div>-->
@@ -56,7 +65,7 @@ const updatePreference = <K extends keyof typeof preferences.value>(
         <!--                        <div class="flex items-center justify-between">-->
         <!--                            <div class="space-y-1">-->
         <!--                                <AppLabel class="text-sm">Auto-refresh routes</AppLabel>-->
-        <!--                                <p class="text-muted-foreground text-xs">-->
+        <!--                                <p class="text-subtle-foreground text-xs">-->
         <!--                                    Automatically refresh routes when the application-->
         <!--                                    starts-->
         <!--                                </p>-->
@@ -71,7 +80,7 @@ const updatePreference = <K extends keyof typeof preferences.value>(
 
         <!--                        <div class="space-y-1">-->
         <!--                            <AppLabel class="text-sm">Maximum history logs</AppLabel>-->
-        <!--                            <p class="text-muted-foreground mb-2 text-xs">-->
+        <!--                            <p class="text-subtle-foreground mb-2 text-xs">-->
         <!--                                Maximum number of request logs to keep in history-->
         <!--                            </p>-->
         <!--                            <AppInput-->
@@ -107,16 +116,16 @@ const updatePreference = <K extends keyof typeof preferences.value>(
                         <PaletteIcon class="h-4 w-4" />
                         <h3 class="text-sm font-medium">Appearance</h3>
                     </div>
-                    <p class="text-muted-foreground text-xs">
+                    <p class="text-subtle-foreground text-xs">
                         Customize the visual appearance of the application.
                     </p>
                 </div>
             </div>
             <div class="col-span-8">
-                <div class="rounded-lg border p-3.5">
-                    <div class="space-y-1">
-                        <AppLabel class="text-sm">Theme</AppLabel>
-                        <p class="text-muted-foreground mb-2 text-xs">
+                <AppPanel class="rounded-lg border">
+                    <AppPanelContent class="space-y-1 p-3.5 pt-3.5">
+                        <AppLabel>Theme</AppLabel>
+                        <p class="text-subtle-foreground mb-2 text-xs">
                             Choose your preferred color scheme
                         </p>
                         <AppSelect
@@ -138,13 +147,13 @@ const updatePreference = <K extends keyof typeof preferences.value>(
                                 <AppSelectItem value="system">System</AppSelectItem>
                             </AppSelectContent>
                         </AppSelect>
-                    </div>
-                </div>
+                    </AppPanelContent>
+                </AppPanel>
             </div>
         </div>
 
         <!-- Divider -->
-        <div class="border-t border-zinc-200 dark:border-zinc-800"></div>
+        <div class="border-border border-t"></div>
 
         <!-- Request Defaults -->
         <div class="grid gap-2 sm:grid-cols-12 sm:gap-8">
@@ -154,17 +163,17 @@ const updatePreference = <K extends keyof typeof preferences.value>(
                         <ZapIcon class="h-4 w-4" />
                         <h3 class="text-sm font-medium">Request Defaults</h3>
                     </div>
-                    <p class="text-muted-foreground text-xs">
+                    <p class="text-subtle-foreground text-xs">
                         Set default values for new requests.
                     </p>
                 </div>
             </div>
             <div class="col-span-8">
-                <div class="rounded-lg border p-3.5">
-                    <div class="space-y-4">
+                <AppPanel class="rounded-lg border">
+                    <AppPanelContent class="space-y-4 p-3.5 pt-3.5">
                         <div class="space-y-1">
-                            <AppLabel class="text-sm">Default request body type</AppLabel>
-                            <p class="text-muted-foreground mb-2 text-xs">
+                            <AppLabel>Default request body type</AppLabel>
+                            <p class="text-subtle-foreground mb-2 text-xs">
                                 Default content type for request bodies
                             </p>
                             <AppSelect
@@ -203,10 +212,8 @@ const updatePreference = <K extends keyof typeof preferences.value>(
                         </div>
 
                         <div class="space-y-1">
-                            <AppLabel class="text-sm">
-                                Default authorization type
-                            </AppLabel>
-                            <p class="text-muted-foreground mb-2 text-xs">
+                            <AppLabel>Default authorization type</AppLabel>
+                            <p class="text-subtle-foreground mb-2 text-xs">
                                 Default authorization method for new requests
                             </p>
                             <AppSelect
@@ -241,8 +248,8 @@ const updatePreference = <K extends keyof typeof preferences.value>(
                                 </AppSelectContent>
                             </AppSelect>
                         </div>
-                    </div>
-                </div>
+                    </AppPanelContent>
+                </AppPanel>
             </div>
         </div>
     </div>

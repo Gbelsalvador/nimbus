@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component RouteExplorer
+ * @description The main sidebar component for exploring and searching available API routes.
+ */
 import {
     AppSidebar,
     AppSidebarContent,
@@ -7,35 +11,45 @@ import {
     AppSidebarGroupLabel,
     AppSidebarInput,
     AppSidebarMenu,
-    AppSidebarRail,
 } from '@/components/base/sidebar';
 import ApplicationSwitcher from '@/components/domain/RoutesExplorer/ApplicationSwitcher.vue';
 import RouteExplorerHeader from '@/components/domain/RoutesExplorer/RouteExplorerHeader.vue';
 import RouteExplorerVersionSelector from '@/components/domain/RoutesExplorer/RouteExplorerVersionSelector.vue';
 import RoutesList from '@/components/domain/RoutesExplorer/RoutesList/RoutesList.vue';
-import { RouteDefinition, RoutesGroup } from '@/interfaces/routes/routes';
+import { type RouteDefinition, type RoutesGroup } from '@/interfaces/routes/routes';
 import { useConfigStore } from '@/stores';
 import { uniquePersistenceKey } from '@/utils/stores';
 import { useStorage } from '@vueuse/core';
 import { computed, ref, watch } from 'vue';
 
 /*
- * Props.
+ * Types & Interfaces.
  */
 
-const props = defineProps<{
+export interface AppRouteExplorerProps {
     routes: { [_key in string]?: RoutesGroup[] } | null;
-}>();
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppRouteExplorerProps>();
+
+const configStore = useConfigStore();
 
 /*
  * State.
  */
 
 const search = useStorage(uniquePersistenceKey('routes-explorer-search-keyword'), '');
+const currentVersion = ref('');
+
+/*
+ * Watchers.
+ */
 
 const versions = computed(() => Object.keys(props.routes || {}));
-
-const currentVersion = ref('');
 
 // Initialize or update current version when versions list changes (e.g. after project switch)
 watch(
@@ -51,7 +65,7 @@ watch(
 );
 
 /*
- * Computed.
+ * Computed & Methods.
  */
 
 const routesInVersion = computed(() => {
@@ -86,12 +100,6 @@ const filteredRoutes = computed(() => {
     );
 });
 
-/*
- * Stores.
- */
-
-const configStore = useConfigStore();
-
 const hasMultipleApplications = computed(
     () => Object.keys(configStore.applications).length > 1,
 );
@@ -103,9 +111,10 @@ const hasMultipleApplications = computed(
         <div>
             <AppSidebarInput
                 v-model="search"
+                variant="toolbar"
                 placeholder="Type to search..."
                 :disabled="routesInVersion.length === 0"
-                class="h-[calc(var(--toolbar-height)+1px)] w-full rounded-none border-0 border-b text-xs shadow-none focus:ring-0 focus-visible:ring-0"
+                class="h-[calc(var(--toolbar-height)+1px)] w-full border-b text-xs"
             />
             <div class="h-sub-toolbar flex items-center overflow-hidden border-b">
                 <ApplicationSwitcher v-if="hasMultipleApplications" class="flex-1" />
@@ -143,6 +152,5 @@ const hasMultipleApplications = computed(
                 </AppSidebarGroupContent>
             </AppSidebarGroup>
         </AppSidebarContent>
-        <AppSidebarRail />
     </AppSidebar>
 </template>

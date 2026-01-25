@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component RequestBuilderEndpoint
+ * @description The endpoint input and method selector for the request builder.
+ */
 import { AppButton } from '@/components/base/button';
 import {
     AppDropdownMenu,
@@ -15,28 +19,35 @@ import {
     AppSelectGroup,
     AppSelectItem,
     AppSelectLabel,
+    AppSelectSeparator,
     AppSelectTrigger,
     AppSelectValue,
 } from '@/components/base/select';
 import { useRouteSegmentSelection } from '@/composables/request/useRouteSegmentSelection';
-import { RouteDefinition } from '@/interfaces/routes/routes';
+import { type RouteDefinition } from '@/interfaces/routes/routes';
 import { useConfigStore, useRequestsHistoryStore, useRequestStore } from '@/stores';
 import { generateCurlCommand } from '@/utils/request';
 import { buildShareableUrl, encodeShareablePayload } from '@/utils/shareableLinks';
 import { cn } from '@/utils/ui';
 import { CodeXml, CornerDownLeftIcon, Link2, SparklesIcon } from 'lucide-vue-next';
-import { computed, HTMLAttributes, ref } from 'vue';
+import { computed, type HTMLAttributes, ref } from 'vue';
 import { toast } from 'vue-sonner';
 import CurlExportDialog from './CurlExportDialog.vue';
 import ShareableLinkDialog from './ShareableLinkDialog.vue';
 
-interface RequestBuilderEndpointProps {
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppRequestBuilderEndpointProps {
     class?: HTMLAttributes['class'];
 }
 
-const props = defineProps<RequestBuilderEndpointProps>();
+/*
+ * Component Setup.
+ */
 
-const availableMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+const props = defineProps<AppRequestBuilderEndpointProps>();
 
 /*
  * Stores.
@@ -53,12 +64,12 @@ const historyStore = useRequestsHistoryStore();
 const showCurlDialog = ref(false);
 const curlCommand = ref('');
 const hasSpecialAuth = ref(false);
-
+const availableMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 const showShareableLinkDialog = ref(false);
 const shareableLink = ref('');
 
 /*
- * Computed.
+ * Computed & Methods.
  */
 
 const pendingRequestData = computed(() => requestStore.pendingRequestData);
@@ -98,6 +109,14 @@ const { handleClick: autoSelectRouteVariableSegmentWhenApplicable } =
  * Actions.
  */
 
+const executeCurrentRequest = async function () {
+    if (!requestStore.pendingRequestData) {
+        return;
+    }
+
+    await requestStore.executeCurrentRequest();
+};
+
 /**
  * Executes request of Enter key is pressed.
  */
@@ -108,14 +127,6 @@ const executeCurrentRequestWhenEnterIsPressed = (event: KeyboardEvent) => {
 
     event.preventDefault();
     executeCurrentRequest();
-};
-
-const executeCurrentRequest = async function () {
-    if (!requestStore.pendingRequestData) {
-        return;
-    }
-
-    await requestStore.executeCurrentRequest();
 };
 
 /**
@@ -170,17 +181,18 @@ const openShareableLinkDialog = () => {
 </script>
 
 <template>
-    <div :class="cn('flex', props.class)">
+    <div :class="cn('flex', props.class)" data-testid="request-builder-endpoint">
         <AppSelect v-model="method">
             <AppSelectTrigger
-                class="h-full w-[95px] rounded-none border-0 border-r pr-1.5 pl-5 text-xs shadow-none focus:ring-0 focus-visible:ring-0"
+                variant="toolbar"
+                class="h-full w-[95px] border-r pr-1.5 pl-5 text-xs"
             >
                 <AppSelectValue :placeholder="method ? '' : 'Select a Method'">
                     {{ method || 'Select a Method' }}
                 </AppSelectValue>
             </AppSelectTrigger>
             <AppSelectContent>
-                <AppSelectGroup>
+                <AppSelectGroup v-if="currentRouteSupportedMethods.length">
                     <AppSelectLabel>Supported</AppSelectLabel>
                     <AppSelectItem
                         v-for="supportedMethod in currentRouteSupportedMethods"
@@ -191,7 +203,10 @@ const openShareableLinkDialog = () => {
                     </AppSelectItem>
                 </AppSelectGroup>
                 <AppSelectGroup v-if="currentRouteUnsupportedMethods.length !== 0">
-                    <AppSelectLabel>Other</AppSelectLabel>
+                    <template v-if="currentRouteSupportedMethods.length">
+                        <AppSelectSeparator />
+                        <AppSelectLabel>Other</AppSelectLabel>
+                    </template>
                     <AppSelectItem
                         v-for="unsupportedMethod in currentRouteUnsupportedMethods"
                         :key="unsupportedMethod"
@@ -206,7 +221,8 @@ const openShareableLinkDialog = () => {
             <AppInput
                 ref="inputRef"
                 v-model="endpoint"
-                class="h-full flex-1 rounded-none border-0 text-xs shadow-none focus:ring-0 focus-visible:ring-0"
+                variant="toolbar"
+                class="h-full flex-1 text-xs"
                 placeholder="<endpoint>"
                 data-testid="endpoint-input"
                 @click="autoSelectRouteVariableSegmentWhenApplicable"

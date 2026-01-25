@@ -10,9 +10,10 @@ import RouteExtractorExceptionRenderer from '@/components/domain/Errors/RouteExt
 import RouteExplorer from '@/components/domain/RoutesExplorer/RouteExplorer.vue';
 import { useSharedStateRestoration } from '@/composables/request/useSharedStateRestoration';
 import { useResponsiveResizable } from '@/composables/ui/useResponsiveResizable';
-import { RouteExtractorException } from '@/interfaces';
+import type { RouteExtractorException } from '@/interfaces';
 import { useRoutesStore } from '@/stores';
-import { onBeforeMount, TemplateRef, useTemplateRef } from 'vue';
+import type { TemplateRef } from 'vue';
+import { onBeforeMount, useTemplateRef } from 'vue';
 
 defineOptions({
     name: 'MainPage',

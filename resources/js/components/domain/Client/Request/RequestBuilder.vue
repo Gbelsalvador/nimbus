@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component RequestBuilder
+ * @description The main container for constructing API requests, including tabs for params, body, auth, and headers.
+ */
 import {
     AppTabs,
     AppTabsContent,
@@ -15,6 +19,22 @@ import {
 import { uniquePersistenceKey } from '@/utils/stores';
 import { useStorage } from '@vueuse/core';
 
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppRequestBuilderProps {}
+
+/*
+ * Component Setup.
+ */
+
+defineProps<AppRequestBuilderProps>();
+
+/*
+ * State.
+ */
+
 const tab = useStorage(uniquePersistenceKey('request-builder-tab'), 'body');
 </script>
 
@@ -23,17 +43,14 @@ const tab = useStorage(uniquePersistenceKey('request-builder-tab'), 'body');
         class="relative flex h-full max-h-full flex-1 flex-col"
         data-testid="request-builder-root"
     >
-        <RequestBuilderEndpoint
-            class="h-toolbar border-b"
-            data-testid="request-builder-endpoint"
-        />
+        <RequestBuilderEndpoint class="h-toolbar border-b" />
         <AppTabs
             :default-value="tab"
             class="mt-0 flex flex-1 flex-col overflow-hidden"
             data-testid="app-tabs-container"
             @update:model-value="tab = $event as string"
         >
-            <div class="bg-subtle-background border-b">
+            <div class="bg-subtle border-b">
                 <AppTabsList class="h-toolbar px-panel rounded-none">
                     <AppTabsTrigger value="parameters" label="Parameters" />
                     <AppTabsTrigger value="body" label="Body" />

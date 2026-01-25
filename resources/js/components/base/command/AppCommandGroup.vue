@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component AppCommandGroup
+ * @description Groups related command items together with an optional heading.
+ */
 import { cn } from '@/utils/ui';
 import { reactiveOmit } from '@vueuse/core';
 import type { ListboxGroupProps } from 'reka-ui';
@@ -7,14 +11,26 @@ import type { HTMLAttributes } from 'vue';
 import { computed, onMounted, onUnmounted } from 'vue';
 import { provideCommandGroupContext, useCommand } from '.';
 
-const props = defineProps<
-    ListboxGroupProps & {
-        class?: HTMLAttributes['class'];
-        heading?: string;
-    }
->();
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppCommandGroupProps extends ListboxGroupProps {
+    class?: HTMLAttributes['class'];
+    heading?: string;
+}
+
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppCommandGroupProps>();
 
 const delegatedProps = reactiveOmit(props, 'class');
+
+/*
+ * Computed & Methods.
+ */
 
 const { allGroups, filterState } = useCommand();
 const id = useId();
@@ -44,7 +60,7 @@ onUnmounted(() => {
     >
         <ListboxGroupLabel
             v-if="heading"
-            class="text-muted-foreground px-2 py-1.5 text-xs font-medium"
+            class="text-subtle-foreground px-2 py-1.5 text-xs font-medium"
         >
             {{ heading }}
         </ListboxGroupLabel>

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * @component RequestBodySelector
+ * @description Dropdown to select the request body type (JSON, FormData, etc).
+ */
 import {
     AppSelect,
     AppSelectContent,
@@ -7,11 +11,20 @@ import {
     AppSelectValue,
 } from '@/components/base/select';
 
-interface Props {
+/*
+ * Types & Interfaces.
+ */
+
+export interface AppRequestBodySelectorProps {
     types: Array<{ id: string; label: string }>;
 }
 
-const props = defineProps<Props>();
+/*
+ * Component Setup.
+ */
+
+const props = defineProps<AppRequestBodySelectorProps>();
+
 const model = defineModel<string>({
     default: () => '',
 });
@@ -19,11 +32,9 @@ const model = defineModel<string>({
 
 <template>
     <div class="flex items-center">
-        <span class="text-muted-foreground w-[80px] text-xs">Payload Type:</span>
+        <span class="text-subtle-foreground w-[80px] text-xs">Payload Type:</span>
         <AppSelect v-model="model">
-            <AppSelectTrigger
-                class="min-w-[120px] rounded-none border-0 text-xs shadow-none focus:ring-0"
-            >
+            <AppSelectTrigger variant="toolbar" class="min-w-[120px] text-xs">
                 <AppSelectValue />
             </AppSelectTrigger>
             <AppSelectContent>
