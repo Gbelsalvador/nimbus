@@ -36,6 +36,9 @@ vi.mock('@/stores', async importOriginal => {
         ...actual,
         useRequestStore: () => mockRequestStore,
         useRequestsHistoryStore: () => mockRequestsHistoryStore,
+        useTabsStore: vi.fn(() => ({
+            activeTab: null,
+        })),
     };
 });
 
@@ -134,23 +137,25 @@ describe('ResponseStatus', () => {
                 },
             };
 
-            mockRequestsHistoryStore.lastLog = {
-                durationInMs: 3000,
-                isProcessing: false,
-                request: mockRequest,
-                response: {
-                    status: STATUS.SUCCESS,
-                    statusCode: 201,
-                    statusText: 'Created',
-                    sizeInBytes: 4096,
-                    timestamp: Math.floor(Date.now() / 1000),
-                    body: '',
-                    headers: [],
-                    cookies: [],
+            const wrapper = createWrapper({
+                props: {
+                    response: {
+                        durationInMs: 3000,
+                        isProcessing: false,
+                        request: mockRequest,
+                        response: {
+                            status: STATUS.SUCCESS,
+                            statusCode: 201,
+                            statusText: 'Created',
+                            sizeInBytes: 4096,
+                            timestamp: Math.floor(Date.now() / 1000),
+                            body: '',
+                            headers: [],
+                            cookies: [],
+                        },
+                    },
                 },
-            };
-
-            const wrapper = createWrapper();
+            });
 
             // Act
 
