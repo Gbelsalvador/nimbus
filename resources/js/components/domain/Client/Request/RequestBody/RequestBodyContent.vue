@@ -3,6 +3,7 @@
  * @component RequestBodyContent
  * @description Dynamic content renderer for the request body based on the selected payload type.
  */
+import { AppScrollArea } from '@/components/base/scroll-area';
 import { RequestBodyTypeEnum } from '@/interfaces/http';
 import type { JSONSchema7 } from 'json-schema';
 import RequestBodyFormData from './RequestBodyFormData.vue';
@@ -42,7 +43,7 @@ const updatePayload = (value: FormData | string | null) => {
 </script>
 
 <template>
-    <div class="min-h-0 w-full flex-1">
+    <AppScrollArea class="min-h-0 w-full flex-1">
         <RequestBodyJson
             v-if="payloadType === RequestBodyTypeEnum.JSON"
             :model-value="payload as string"
@@ -60,5 +61,5 @@ const updatePayload = (value: FormData | string | null) => {
             @update:model-value="updatePayload"
         />
         <RequestBodyFormNone v-else @update:model-value="updatePayload" />
-    </div>
+    </AppScrollArea>
 </template>

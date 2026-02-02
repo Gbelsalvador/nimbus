@@ -8,6 +8,7 @@ import {
     AppCollapsibleContent,
     AppCollapsibleTrigger,
 } from '@/components/base/collapsible';
+import { AppScrollArea } from '@/components/base/scroll-area';
 import {
     AppSidebarGroup,
     AppSidebarGroupContent,
@@ -31,11 +32,16 @@ const tabsStore = useTabsStore();
  * Vertical Scroll.
  */
 
-const { scrollContainer, showTopMask, showBottomMask, scrollTabIntoView } =
-    useTabVerticalScroll({
-        SCROLL_PADDING: 20,
-        MASK_HEIGHT: 32,
-    });
+const {
+    scrollContainer,
+    showTopMask,
+    showBottomMask,
+    updateScrollMasks,
+    scrollTabIntoView,
+} = useTabVerticalScroll({
+    SCROLL_PADDING: 20,
+    MASK_HEIGHT: 32,
+});
 
 const tabElements = ref<Record<string, HTMLElement>>({});
 
@@ -96,6 +102,16 @@ const handleCloseTab = (id: string) => {
  */
 
 const isOpen = defineModel<boolean>('isOpen');
+const scrollAreaRef = ref<InstanceType<typeof AppScrollArea> | null>(null);
+
+watch(
+    () => scrollAreaRef.value?.viewport,
+    viewport => {
+        if (viewport) {
+            scrollContainer.value = viewport;
+        }
+    },
+);
 </script>
 
 <template>
@@ -136,9 +152,10 @@ const isOpen = defineModel<boolean>('isOpen');
                             :class="[showTopMask && isOpen ? 'opacity-100' : 'opacity-0']"
                         />
 
-                        <div
-                            ref="scrollContainer"
-                            class="no-scrollbar min-h-0 flex-1 overflow-y-scroll"
+                        <AppScrollArea
+                            ref="scrollAreaRef"
+                            class="min-h-0 flex-1"
+                            @scroll="updateScrollMasks"
                         >
                             <draggable
                                 v-model="tabsModel"
@@ -177,7 +194,7 @@ const isOpen = defineModel<boolean>('isOpen');
                                     </AppSidebarMenuItem>
                                 </template>
                             </draggable>
-                        </div>
+                        </AppScrollArea>
 
                         <!-- Bottom Scroll Mask -->
                         <div
