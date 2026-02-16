@@ -60,6 +60,8 @@ const updatePayload = (value: FormData | string | null) => {
             :model-value="payload as string"
             @update:model-value="updatePayload"
         />
-        <RequestBodyFormNone v-else @update:model-value="updatePayload" />
+        <div v-else>
+            <RequestBodyFormNone @update:model-value="updatePayload" />
+        </div>
     </AppScrollArea>
 </template>
