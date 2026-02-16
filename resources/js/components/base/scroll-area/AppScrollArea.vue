@@ -16,7 +16,7 @@ import AppScrollBar from './AppScrollBar.vue';
 
 export interface AppScrollAreaProps extends ScrollAreaRootProps {
     class?: HTMLAttributes['class'];
-    viewportChildTag: string;
+    viewportChildTag?: string;
 }
 
 /*
